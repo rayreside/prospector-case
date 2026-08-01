@@ -1,12 +1,75 @@
-# Blender
-*.blend1
-*.blend2
+# ---------------------------------------------------------------- OpenSCAD
+# Rendered output - regenerate with:
+#   openscad -o out.stl -D 'part="top"' scad/urchin.scad
+scad/**/*.stl
+scad/**/*.3mf
+scad/**/*.off
+scad/**/*.amf
+scad/out/
+scad/build/
+render/
 
-# OS
-Thumbs.db
-desktop.ini
-.DS_Store
+# OpenSCAD editor state and caches
+*.scad.bak
+.openscad/
+cache/
 
-# slicer output
+# Dependency files from use<>/include<> tracking
+*.deps
+
+# ------------------------------------------------------------------ Blender
+*.blend
+*.blend[0-9]*
+*.blend[0-9]*[0-9]
+*.blend@
+
+# ------------------------------------------------------------------ FreeCAD
+*.FCStd1
+*.FCBak
+*.FCStd.lock
+
+# ------------------------------------------------------------------- slicer
+# Slicer projects and toolpaths - not source
 *.gcode
+*.gcode.3mf
+*.bgcode
+*.sl1
+*.ctb
+*.gco
+# Bambu / Orca / Prusa project files
 *.3mf
+!high-profile/**/*.3mf
+!low-profile/**/*.3mf
+
+# --------------------------------------------------------------- CAD scratch
+# Autosaves and recovery, not the real files
+*~
+*.tmp
+*.autosave
+*_recover.*
+
+# ------------------------------------------------------------------- Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.mypy_cache/
+.ruff_cache/
+
+# ----------------------------------------------------------------- editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---------------------------------------------------------------------- OS
+.DS_Store
+.AppleDouble
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --------------------------------------------------------------- Claude Code
+.claude/settings.local.json
