@@ -29,7 +29,9 @@ def section(t, z):
         if ln < 1e-12:
             continue
         p0.append(pts[0]); p1.append(pts[1]); nn.append(n / ln)
-    return np.array(p0), np.array(p1), np.array(nn)
+    # reshape so an empty section is still (0, 2) and stays indexable
+    return (np.array(p0).reshape(-1, 2), np.array(p1).reshape(-1, 2),
+            np.array(nn).reshape(-1, 2))
 
 
 def thickness(p0, p1, nn, samples=3, eps=1e-4):
