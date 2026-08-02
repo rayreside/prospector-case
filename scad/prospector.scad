@@ -65,6 +65,24 @@ CAP_PILOT = 2.10;     // M2.5 forming its own thread in the post
 CAP_POST_L = 6.00;
 KERB      = 1.50;     // wall of the tray that locates the hat
 KERB_H    = 2.50;     // how far it rises past the hat's underside
+// The hat's own mounting holes. Centre-to-centre comes from two straddling
+// spans -- 19.2 over the far walls and 15.0 between the near ones -- which
+// average to the centre distance and cancel the hole diameter. Their half
+// difference gives that diameter back as a check: 2.10, exactly an M2
+// clearance hole, so both spans were taken on centre.
+//
+// A photograph had put the spacing at 16.80, which was 0.3 out. Fine as a
+// sanity check, useless as a dimension.
+// Both numbers now measured. The south strip is 6.0 wide (27 board less the
+// XIAO's 21), so a centre has to fall between 1.05 and 4.95 of the south edge
+// -- which is how a mis-keyed 16 for the near-wall distance was caught: from
+// either edge it put the hole inside the XIAO's footprint.
+HAT_SCREWS = true;
+HAT_SCR_DX = 17.10;   // centre to centre, measured
+HAT_SCR_DY = 2.65;    // up from the south edge: 1.60 to the near wall + 1.05
+HAT_SCR_D  = 1.70;    // M2 forming its own thread; the board's hole is 2.10
+HAT_POST_D = 4.50;
+
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
@@ -312,6 +330,25 @@ module mcu_hooks() {
         }
 }
 
+// Posts under the hat at its own mounting holes, standing exactly MCU_LIFT
+// proud so the board still sits flat on them rather than being lifted off the
+// tray floor.
+module hat_posts() {
+    if (HAT_SCREWS)
+        for (sx = [-1, 1])
+            translate([sx * HAT_SCR_DX / 2, MCU_Y + MCU_CLR + HAT_SCR_DY,
+                       FLOOR - 0.2])
+                cylinder(d = HAT_POST_D, h = MCU_LIFT + 0.2);
+}
+
+module hat_screws() {
+    if (HAT_SCREWS)
+        for (sx = [-1, 1])
+            translate([sx * HAT_SCR_DX / 2, MCU_Y + MCU_CLR + HAT_SCR_DY,
+                       FLOOR - 1])
+                cylinder(d = HAT_SCR_D, h = MCU_LIFT + 6);
+}
+
 module mcu_tray_placed() {
     intersection() {
         translate([-(MCU_DX + 2 * MCU_CLR + 2 * KERB) / 2, 0, 0]) mcu_tray();
@@ -415,7 +452,7 @@ module shell() {
             intersection() {
                 union() {
                     bosses(); mcu_tray_placed(); cap_posts(); tie_posts();
-                    mcu_hooks();
+                    mcu_hooks(); hat_posts();
                 }
                 outer();
             }
@@ -423,6 +460,7 @@ module shell() {
         mcu_box();
         screw_holes();
         cap_screws();
+        hat_screws();
         translate([-100, DEPTH - CAP_T, -100]) cube([200, CAP_T + 60, 200]);
     }
 }

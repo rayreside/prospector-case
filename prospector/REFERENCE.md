@@ -80,13 +80,14 @@ to be wrong in the other direction.
 
 The module carries a **12-pin connector** on its back, not solder pads: VCC,
 GND, LCD_DIN, LCD_CLK, LCD_CS, LCD_DC, LCD_RST, LCD_BL, TP_SDA, TP_SCL,
-TP_RST, TP_IRQ. The supplied cable plugs in; the four TP_* wires are cut,
-leaving **8 conductors** to the XIAO, which are soldered at that end.
+TP_RST, TP_IRQ. The supplied cable plugs in; upstream cuts the four TP_* wires and solders the
+remaining eight to the XIAO's pads. **The build this is for does not** — see
+below; it plugs into a hat at the far end too.
 
-So the display end is a plug, and the connector body plus the cable's bend
-radius set a hard standoff behind the module — the wires cannot leave flush.
-The upstream body has a 39.09 x 17.57 mm window in its front face, centred on
-the module, purely to clear that connector and cable.
+Either way the display end is a plug, and the connector body plus the cable's
+bend radius set a hard standoff behind the module. The upstream body has a
+39.09 x 17.57 mm window in its front face, centred on the module, purely to
+clear that connector and cable.
 
 The connector sits on the **left** as you face the screen — `-x` in the model's
 frame, on the right if you are looking at the back of the board.
@@ -97,13 +98,12 @@ The unit being designed around is **not** the upstream wiring. The XIAO carries
 a **hat with its own connector for the LCD cable**, so the link is a plugged
 cable at *both* ends rather than eight wires soldered to the XIAO's pads.
 
-That changes three things and all of them matter:
-
 Measured:
 
 | | |
 |---|---|
 | Hat outline | **21.9 x 27.0** mm |
+| Hat mounting holes | **17.10** mm apart, **2.65** from the south edge, **2.10** dia |
 | Whole stack, USB-C shell to the hat's socket | **9.82** mm |
 | Glass to the end of the USB-C, boards perpendicular | **~36** mm |
 
@@ -125,20 +125,19 @@ several months of use. Do not spend geometry on it.
 
 ### What this rules out
 
-A 55-degree screen with the hat lying flat does not fit at any depth up to
-70 mm. The hat's top lands at z = 13.6, which is level with the middle of the
-display, so the display's back plane and the hat foul each other long before
-the case is small. Steepening the screen rescues it, but only to about 48 mm
-deep against upstream's 51.4 — a 7% win, not worth the change.
+The screen angle is the binding constraint, not the wall thickness and not any
+cleverness in the layout. At the upstream 55 degrees the display's back plane
+climbs over the hat too slowly, and the case can only be made to fit by raising
+the display 10 mm — at which point the skirt that brings it back down to the
+desk juts 10.4 mm forward and the whole thing comes out **bigger than
+upstream**, 55.4 x 43.4 against 51.4 x 38.0.
 
-The screen angle is the binding constraint, not the wall thickness and not the
-layout cleverness.
+70 degrees is the minimum of that curve. The full sweep is in the case README.
 
-## Seeed XIAO nRF52840
+## Seeed XIAO nRF52840 — bare, for reference only
 
-21.0 x 17.5 x 3.5 mm, about 4.5 mm over the USB-C shell. It fits entirely
-inside the display's own 39 x 31 shadow, which is what makes folding the two
-boards together worthwhile.
+Not what is being designed around; see the hat above. 21.0 x 17.5 x 3.5 mm,
+about 4.5 mm over the USB-C shell.
 
 In the stock case it lies flat on the floor at the back, USB-C out the rear
 face through a **9.5 x 3.75 mm** slot centred at x = 0, z = 5.355. The rear
