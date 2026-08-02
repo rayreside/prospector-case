@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python tools/stlstat.py *)",
+      "Bash(python tools/clusters.py *)",
+      "Bash(python tools/slice.py *)",
+      "Bash(python tools/probe.py *)",
+      "Bash(python tools/shells.py *)",
+      "Bash(python tools/walls.py *)",
+      "Bash(python tools/outline.py *)",
+      "Bash(\"/c/Program Files/OpenSCAD/openscad.exe\" *)",
+      "Bash('/c/Program Files/OpenSCAD/openscad.exe' *)",
+      "Bash(mkdir *)"
+    ]
+  }
+}
