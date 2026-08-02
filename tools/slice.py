@@ -9,9 +9,22 @@ import numpy as np
 from stlstat import load_stl
 
 
-def area_at(t, z):
-    total = 0.0
+def area_at(t, z, _eps=1e-6):
+    """Cross-sectional area at z.
+
+    Sampling exactly on a coplanar face is unreliable: faces lying in the plane
+    contribute no crossing, and the walls that die on it do not strictly cross
+    either, so their segments vanish and the shoelace loses whole loops. On this
+    model, asking for z=3.0000 -- the underside pocket's ceiling -- reported
+    5399 mm^2 against a true 4867, an 11% phantom error, while z=3.0010 agreed
+    with the raster to 0.1%. So nudge off any plane that holds a flat face.
+    """
     zs = t[:, :, 2]
+    flat = (np.abs(zs - z) < 1e-9).all(1)
+    if flat.any():
+        z = z + _eps
+
+    total = 0.0
     crosses = (zs.min(1) < z) & (zs.max(1) > z)
     tris = t[crosses]
     if len(tris) == 0:
@@ -35,12 +48,13 @@ def area_at(t, z):
     return total
 
 
-ref, scad, heights = sys.argv[1], sys.argv[2], [float(h) for h in sys.argv[3:]]
-tr, ts = load_stl(ref), load_stl(scad)
-print(f"{'z (mm)':>8} {'reference':>12} {'openscad':>12} {'delta':>10} {'delta %':>9}")
-for z in heights:
-    ar, as_ = area_at(tr, z), area_at(ts, z)
-    d = as_ - ar
-    pct = (d / ar * 100) if ar else float('nan')
-    print(f"{z:8.2f} {ar:12.2f} {as_:12.2f} {d:10.2f} {pct:8.1f}%")
-print("\n(areas in mm^2)")
+if __name__ == "__main__":
+    ref, scad, heights = sys.argv[1], sys.argv[2], [float(h) for h in sys.argv[3:]]
+    tr, ts = load_stl(ref), load_stl(scad)
+    print(f"{'z (mm)':>8} {'reference':>12} {'openscad':>12} {'delta':>10} {'delta %':>9}")
+    for z in heights:
+        ar, as_ = area_at(tr, z), area_at(ts, z)
+        d = as_ - ar
+        pct = (d / ar * 100) if ar else float('nan')
+        print(f"{z:8.2f} {ar:12.2f} {as_:12.2f} {d:10.2f} {pct:8.1f}%")
+    print("\n(areas in mm^2)")
