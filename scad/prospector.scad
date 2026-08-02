@@ -65,6 +65,9 @@ CAP_PILOT = 2.10;     // M2.5 forming its own thread in the post
 CAP_POST_L = 6.00;
 KERB      = 1.50;     // wall of the tray that locates the hat
 KERB_H    = 2.50;     // how far it rises past the hat's underside
+HOOK_W    = 6.00;     // hooks over the hat's front corners
+HOOK_D    = 1.50;     // how far they reach back over it
+HOOK_T    = 1.20;     // thickness of the tongue
 TIE_POSTS = true;     // a pair of posts to zip-tie the bundle down to
 TIE_X     = 7.00;
 TIE_D     = 3.00;
@@ -291,6 +294,24 @@ module mcu_tray() {
               MCU_LIFT + KERB_H + 0.2], center = false);
 }
 
+// Two hooks over the hat's front corners, so it is held down as well as
+// located. This is deliberately not a screw: the hat's two mounting holes are
+// in the strip south of the XIAO and their spacing is not known, and a post in
+// the wrong place fouls the board instead of holding it. The hat goes in from
+// the back, slides forward under these, and the rear cap closes behind it --
+// which leaves it constrained in every direction without needing the holes at
+// all. The USB-C passing through the cap slot pins the far end.
+module mcu_hooks() {
+    hx = MCU_DX / 2 + MCU_CLR;
+    top = MCU_Z + MCU_DZ;
+    for (sx = [-1, 1])
+        translate([sx * hx - (sx > 0 ? HOOK_W : 0), MCU_Y - KERB, FLOOR - 0.2]) {
+            cube([HOOK_W, KERB + MCU_CLR, top - FLOOR + HOOK_T + 0.2]);
+            translate([0, KERB + MCU_CLR, top - FLOOR + 0.2])
+                cube([HOOK_W, HOOK_D, HOOK_T]);
+        }
+}
+
 module mcu_tray_placed() {
     intersection() {
         translate([-(MCU_DX + 2 * MCU_CLR + 2 * KERB) / 2, 0, 0]) mcu_tray();
@@ -392,7 +413,10 @@ module shell() {
         union() {
             difference() { outer(); hollow(); }
             intersection() {
-                union() { bosses(); mcu_tray_placed(); cap_posts(); tie_posts(); }
+                union() {
+                    bosses(); mcu_tray_placed(); cap_posts(); tie_posts();
+                    mcu_hooks();
+                }
                 outer();
             }
         }

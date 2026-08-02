@@ -16,10 +16,10 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **47.0** x 38.7 |
 | Enclosed | 59.86 cm3 | **51.00 cm3** |
-| Plastic | 15.92 cm3 | **12.51 cm3** |
+| Plastic | 15.92 cm3 | **12.72 cm3** |
 | Parts | 3 | 2 |
 
-Same width, 8.5% shallower, 0.7 mm taller, 15% less enclosed volume, 21% less
+Same width, 8.5% shallower, 0.7 mm taller, 15% less enclosed volume, 20% less
 filament. Both parts watertight, one shell each, zero boundary edges.
 
 The width does not move and cannot: it is the display's lip counterbore plus
@@ -92,7 +92,7 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 |---|---|
 | display | drops in from the front, lip in the counterbore, 4 x M2 from inside into its own standoffs |
 | rear cap | 2 x M2.5 into posts at x = +/-16, from outside |
-| hat | tray on its measured 21.9 x 27.0 outline, kerb on three sides |
+| hat | tray on its measured 21.9 x 27.0 outline, two hooks over its front corners |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
 
 The display goes in from the **front** and its own lip lands on the case — not
@@ -107,9 +107,13 @@ own mounting bosses. At the 2.50 it started at, all four holes fell inside the
 connector window with nothing under them — a case the display could not be
 screwed to, invisible in every render.
 
-The hat is **located but not fastened**: its two mounting holes are in the strip
-south of the XIAO and their spacing is not measured, so a guessed post would
-foul the board rather than hold it.
+The hat is held by **hooks rather than screws**, deliberately. Its two mounting
+holes are in the strip south of the XIAO and their spacing is not known, and a
+post in the wrong place fouls the board instead of holding it. Two tongues
+reach 1.5 mm back over its front corners; the hat goes in from the back, slides
+forward under them, and the rear cap closes behind it. Constrained in every
+direction without needing the holes at all, and the USB-C through the cap slot
+pins the far end. Costs 22 mm2 of extra support.
 
 > Anything added inside the shell has to be unioned **after** `hollow()` is
 > subtracted, or the cavity swallows it — built the wrong way round, the seat
@@ -126,9 +130,9 @@ desk-down the bad orientation:
 
 | shell orientation | support | bed contact | height |
 |---|---|---|---|
-| **desk-down (0)** | **557 mm2** | **1842 mm2** | 38.7 |
-| front face down (110) | 888 mm2 | 361 mm2 | 42.6 |
-| back face down (-90) | 891 mm2 | 202 mm2 | 45.4 |
+| **desk-down (0)** | **579 mm2** | **1842 mm2** | 38.7 |
+| front face down (110) | 988 mm2 | 361 mm2 | 42.6 |
+| back face down (-90) | 989 mm2 | 202 mm2 | 45.4 |
 
 Least support *and* five times the bed contact. All of its support is interior
 roof that nobody sees. The cap laid flat needs none.
@@ -139,13 +143,14 @@ it is really just the second layer.
 
 ## Still to do
 
-- **Hat screws.** Needs the two hole centres measured — spacing across, and
-  distance from the south edge.
-- **`PLUG_H` is the last estimate** in the model, 4 mm inferred from the hat's
-  9.82 stack. It feeds the plug-room check, which passes at 20.27 against a
-  need of 15, so it would take a large error to bite.
-- **Nothing has been printed yet.** Every figure here is measured off geometry,
-  not off a part.
+**Nothing has been printed yet.** Every figure here is measured off geometry,
+not off a part. That is the only open item.
+
+`PLUG_H` is the one estimated number in the model — 4 mm, inferred from the
+hat's 9.82 stack rather than measured — and it is provably not binding. The
+plug-room check has 20.27 mm against a requirement that is the greater of 15
+and `CONN_H + PLUG_H`, so it does not fail until `PLUG_H` exceeds **18.85**.
+The entire hat stack is 9.82 tall. Measuring it would change nothing.
 
 ## Layouts that were considered and dropped
 
