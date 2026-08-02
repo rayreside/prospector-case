@@ -47,10 +47,16 @@ def openscad():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("part", choices=list(REF) + ["all"])
-    ap.add_argument("--at", nargs=2, type=float, metavar=("X", "Y"),
-                    help="centre the view here (model coords)")
+    ap.add_argument("--at", nargs="+", type=float, metavar="C",
+                    help="centre the view here: X Y [Z]")
     ap.add_argument("--dist", type=float, help="smaller is closer; omit to fit")
     ap.add_argument("--size", type=int, default=1600)
+    ap.add_argument("--cut", choices=["x", "y", "z"],
+                    help="section the model on this axis and look inside")
+    ap.add_argument("--cut-at", type=float, help="where the plane sits")
+    ap.add_argument("--cut-flip", action="store_true", help="keep the other half")
+    ap.add_argument("--edges", action="store_true",
+                    help="draw facet edges; makes flat faces readable")
     # Off by default: in a flat top-down render the ghost is the same flat
     # colour as the model, so overlaying them makes the image ambiguous rather
     # than informative. Flicking between the two output files is clearer.
@@ -59,21 +65,42 @@ def main():
     ap.add_argument("--out", default=".")
     a = ap.parse_args()
 
+    # A section has to be looked at side-on. Viewed from straight above, the cut
+    # face is edge-on and you see nothing -- which is exactly what happens if
+    # the canonical top-down camera is left in place.
+    if a.cut == "y":
+        rot = "90,0,0" if a.cut_flip else "90,0,180"
+    elif a.cut == "x":
+        rot = "90,0,90" if a.cut_flip else "90,0,270"
+    else:
+        rot = "0,0,180"                       # canonical top-down
     if a.at and a.dist:
-        cam = f"--camera={a.at[0]},{a.at[1]},6,0,0,180,{a.dist}"
+        at = list(a.at) + [6.0] * (3 - len(a.at))
+        cam = f"--camera={at[0]},{at[1]},{at[2]},{rot},{a.dist}"
         fit = []
     else:
-        cam = "--camera=0,0,0,0,0,180,0"      # rz=180 -> canonical
+        cam = f"--camera=0,0,0,{rot},0"
         fit = ["--viewall", "--autocenter"]
 
     common = [cam, *fit, "--projection=o",
               f"--imgsize={a.size},{int(a.size * 0.82)}",
               "--colorscheme=Tomorrow"]
+    if a.edges or a.cut:
+        # a section is unreadable without them: every cut face is flat
+        common += ["--render", "--view=edges"]
+
+    cutargs = []
+    if a.cut:
+        cutargs = ["-D", f'cut="{a.cut}"']
+        if a.cut_at is not None:
+            cutargs += ["-D", f"cut_at={a.cut_at}"]
+        if a.cut_flip:
+            cutargs += ["-D", "cut_flip=true"]
     exe = openscad()
     os.makedirs(a.out, exist_ok=True)
 
     model = os.path.join(a.out, f"{a.part}.png")
-    cmd = [exe, *common, "-D", f'part="{a.part}"']
+    cmd = [exe, *common, *cutargs, "-D", f'part="{a.part}"']
     if a.part == "mountains":
         # they vanish into the top when fused, which is not what you want to see
         cmd += ["-D", "fuse_mountains=false"]
@@ -85,8 +112,19 @@ def main():
     if a.part != "all":
         stl = os.path.join(REPO, "high-profile", "right", REF[a.part])
         tmp = os.path.join(a.out, "_ref.scad")
+        body = f'import("{stl.replace(chr(92), "/")}");'
+        if a.cut:
+            # section the reference the same way, or the comparison is useless
+            at = a.cut_at if a.cut_at is not None else 0
+            B, o = 500, (-500 if a.cut_flip else 0)
+            box = {
+                "x": f"translate([{at + o},-250,-250])",
+                "y": f"translate([-250,{at + o},-250])",
+                "z": f"translate([-250,-250,{at + o}])",
+            }[a.cut]
+            body = f"difference() {{ {body} {box} cube({B}); }}"
         with open(tmp, "w") as f:
-            f.write(f'import("{stl.replace(chr(92), "/")}");\n')
+            f.write(body + "\n")
         ref = os.path.join(a.out, f"{a.part}_ref.png")
         subprocess.run([exe, *common, "-o", ref, tmp], check=True)
         os.remove(tmp)
