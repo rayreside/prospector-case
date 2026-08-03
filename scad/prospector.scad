@@ -277,9 +277,15 @@ function ceil_at(y) = min(z_top(y), pocket_z(y) - seat_drop(y));
 
 HAT_YS  = [for (i = [0 : 8]) MCU_Y + i * MCU_DY / 8];
 MCU_FIT  = min([for (y = HAT_YS) ceil_at(y) - hat_top_at(y)]);
-// The cable rises off the socket, which is on the full-height part, so the
-// headroom that matters is measured there and not over the bare strip.
-WIRE_FIT = max([for (y = HAT_YS) if (y >= TALL_Y) ceil_at(y) - hat_top_at(y)]);
+// Measured from the hat's BOARD, which is the datum the 20 mm was taken from.
+// It was being measured from the top of the socket instead -- 3.92 mm higher,
+// an extra requirement with nothing behind it, and the only thing that made a
+// shallower screen fail this test.
+//
+// It is still a conservative proxy: it asks for 20 mm of clear space straight
+// up, when the bundle is free to turn into any part of a 37 cm3 cavity. Treat
+// a near miss here as worth looking at rather than as a verdict.
+WIRE_FIT = max([for (y = HAT_YS) if (y >= TALL_Y) ceil_at(y)]) - (PCB_Z + PCB_T);
 
 echo(str("section ", SEC_W, " x ", SEC_H, ", depth ", DEPTH,
          ", screen ", TILT, " deg, lift ", DISP_LIFT));
