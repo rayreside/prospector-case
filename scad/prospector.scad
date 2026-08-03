@@ -612,7 +612,12 @@ module mcu_box() {
 // Four bosses on the cavity side of the seat, on the module's own measured
 // hole pattern. The screws go in from inside the case: the display drops into
 // its pocket from the back and the glass is in the way from the front.
+// Nothing to draw once BOSS_H is zero: the cylinder would sit entirely inside
+// the seat plate that already exists, adding no material but landing its front
+// face exactly on the seat's front plane. That coplanar contact was the shell's
+// one non-manifold edge -- 0.33 mm of it, at (-12.5, 11.4, 8.1).
 module bosses() {
+    if (BOSS_H > 0)
     for (sx = [-1, 1], sy = [-1, 1])
         translate([0, CY, CZ]) rotate([TILT, 0, 0])
             translate([sx * HOLE_DX / 2, sy * HOLE_DY / 2, -WALL - BOSS_H])

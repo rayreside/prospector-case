@@ -156,6 +156,14 @@ The alternative, if a bolted hat is ever wanted, is to move the pads onto a
 tongue on the rear cap: the hat then bolts to the cap on the bench and the pair
 slide in together. One more feature, no more parts.
 
+> A feature that adds no material can still break the mesh. With `BOSS_H = 0`
+> the seat's boss cylinders sat entirely inside the plate that already existed
+> — zero volume — but their front faces landed exactly on the seat's front
+> plane, and that coplanar contact was the shell's one non-manifold edge. The
+> fix was not to draw them. Found by elimination: `outer()` and
+> `outer() - hollow()` were both clean, so it had to be something unioned on
+> afterwards, and the edge sat exactly on `w = 0`.
+>
 > Anything added inside the shell has to be unioned **after** `hollow()` is
 > subtracted, or the cavity swallows it — built the wrong way round, the seat
 > bosses, the tray and the cap posts all vanished and the shell came back at
