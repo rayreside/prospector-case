@@ -14,13 +14,14 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 
 | | upstream, no sensor | this |
 |---|---|---|
-| Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **45.0** x 38.7 |
-| Enclosed | 59.86 cm3 | **48.89 cm3** |
-| Plastic | 15.92 cm3 | **13.25 cm3** |
+| Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **43.0 x 37.0** |
+| Enclosed | 59.86 cm3 | **45.16 cm3** |
+| Plastic | 15.92 cm3 | **11.60 cm3** |
 | Parts | 3 | 2 |
 
-Same width, 12% shallower, 0.7 mm taller, 18% less enclosed volume, 17% less
-filament. Both parts watertight, one shell each, zero boundary edges.
+Same width, 16% shallower, 1 mm shorter, 25% less enclosed volume, 27% less
+filament, and the screen keeps the upstream 55 degrees. Both parts watertight,
+one shell each, zero boundary edges.
 
 The width does not move and cannot: it is the display's lip counterbore plus
 the ring left standing around it. Everything saved is depth, and it comes from
@@ -56,25 +57,38 @@ Each of these has been wrong at least once in a way that only a number caught:
   face falling; the tallest point is where they cross, and the depth is chosen
   to land the hat's front edge on it.
 
-## Why 70 degrees
+## The screen angle is free
 
-Screen angle and display height are one decision, and 70 is the minimum of a
-measured curve rather than a preference. Steepening the screen makes the
-display's back plane climb over the hat faster, which buys depth; past about 70
-the display's own 9.96 mm thickness projects further forward at its bottom edge
-and gives it back. Every row is a watertight build:
+It is 55 degrees, the same as upstream, and it costs nothing. Every angle comes
+out 43.0 deep; the shallower ones are slightly shorter:
 
-| screen | lift | depth | height | enclosed |
-|---|---|---|---|---|
-| 55 | 10 | 55.4 | 43.4 | 60.39 — worse than upstream |
-| 65 | 6 | 49.2 | 40.6 | 53.74 |
-| **70** | **4** | **47.0** | **38.7** | **51.00** |
-| 75 | 2 | 49.9 | 36.8 | 53.19 |
+| screen | lift | depth | height |
+|---|---|---|---|
+| 70 | 4 | 43.0 | 38.71 |
+| 65 | 4 | 43.0 | 38.40 |
+| 60 | 4 | 43.0 | 37.83 |
+| **55** | **4** | **43.0** | **37.00** |
 
-The lift goes with the angle: a shallower screen needs the display raised
-further before the hat clears underneath, and the skirt that brings the case
-back down to the desk then juts forward. At 55 that skirt adds 10.4 mm to the
-front, which is what ruins it.
+For most of this project the model insisted a shallower screen cost 5-7 mm of
+depth, and it was wrong three separate ways, each found the same way -- by
+being told the space was plainly visible on the assembled part:
+
+1. **The skirt leaned forward.** Below the display the case reaches the desk by
+   extending its cross-section down the *screen plane*, so at a shallow angle
+   it threw material forward instead of dropping: 7.10 mm at 55 against 2.04 at
+   70. Trimmed vertically at the rim, and the depth difference vanished.
+2. **The ceiling test subtracted a wall that was gone.** After the seat was cut
+   back to a rim the window is open above the hat, so what is overhead is the
+   module itself -- not a plate 1.6 below it. And 1.6 was being taken
+   vertically when it is measured along the normal. Over the hat's front corner
+   that was 0.99 reported against 2.59 real.
+3. **The cable's headroom was measured from the socket**, 3.92 mm above the hat
+   it had been measured from.
+
+What remains true is that a 31 mm display at 55 lies over 17.8 mm of the case's
+depth against 10.6 at 70. That is real, and it is why the *interior* is
+shallower behind the module at 55 -- but it does not reach the outside, because
+the depth is set by the hat, not by the display.
 
 ## The form
 

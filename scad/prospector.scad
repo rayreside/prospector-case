@@ -128,25 +128,30 @@ TIE_POSTS = true;     // a pair of posts to zip-tie the bundle down to
 TIE_X     = 7.00;
 TIE_D     = 3.00;
 TIE_H     = 5.00;
-SLACK     = 3.00;     // cable room between the hat and the module's seat
+// Clearance at the hat's front corner, which is where this binds -- a bare
+// board edge under the display's lower rim, 7 mm forward of where the socket
+// even starts. No cable passes there and none ever will, so this is air, not
+// cable room. 3.00 was arbitrary and cost the screen 15 degrees of angle.
+SLACK     = 2.50;
 
 DEPTH     = 43.00;    // *** the size knob. Back wall at y = DEPTH.
 
-// Screen angle and display height are one decision, and 70 is the minimum of
-// the curve rather than a preference. Steepening the screen makes the display's
-// back plane climb over the hat faster, which buys depth; past about 70 the
-// display's own 9.96 mm thickness starts projecting further forward at its
-// bottom edge and gives the depth back. Measured, all watertight builds:
+// The upstream angle, and it costs nothing. Every angle now comes out 43.0
+// deep, and the shallower ones are shorter:
 //
-//     55 / lift 10 -> 55.4 deep, 43.4 tall, 60.39 cm3   (worse than upstream)
-//     65 / lift  6 -> 49.2 deep, 40.6 tall, 53.74 cm3
-//     70 / lift  4 -> 47.2 deep, 38.9 tall, 51.23 cm3   <-- here
-//     75 / lift  2 -> 49.9 deep, 36.8 tall, 53.19 cm3
+//     70 / lift 4   43.0 x 38.71
+//     65 / lift 4   43.0 x 38.40
+//     60 / lift 4   43.0 x 37.83
+//     55 / lift 4   43.0 x 37.00   <-- here
 //
-// The lift goes with the angle: shallower screens need the display raised
-// further before the hat clears underneath, and the skirt that brings the case
-// back down to the desk then juts forward, which is what ruins 55.
-TILT      = 70.0;     // upstream is 55 -- see TILT_UPSTREAM
+// It took three corrections to see that. A skirt that leaned forward instead
+// of dropping made shallow angles look deep; a ceiling test that subtracted a
+// seat wall no longer present made them look tight; and the cable's headroom
+// was measured from the socket rather than from the hat, which was the datum
+// it had been given. Each one was found by being told the space was visible on
+// the assembled part, and each time the geometry was arguing with a photograph
+// and losing.
+TILT      = TILT_UPSTREAM;
 DISP_LIFT = 4.00;     // desk to the lowest point of the pocket
 
 // The hat lies flat on the floor at the back, long axis front to back, so the
@@ -240,11 +245,23 @@ CONN_FIT = HIT_F && HIT_T ? min(T_FRONT, T_TOP)
          : HIT_F ? T_FRONT
          : HIT_T ? T_TOP
          : 999;                                     // the ray misses the hat
-// Measured on the real bundle, not derived: the wires are many and bunched,
-// and 15 mm is what they take without being compressed. That dominates the
-// plug's own reach, so it is the number the depth actually has to satisfy.
-WIRE_ROOM = 15.00;
-CONN_NEED = max(CONN_H + PLUG_H, WIRE_ROOM);
+// This ray checks the PLUG, and only the plug: how far a connector on the
+// module's socket can reach straight back before meeting the hat. It was also
+// being asked to carry the bundle's 15 mm, which is double counting -- the
+// bundle is checked by the headroom test below, in the direction it actually
+// travels. Behind the module's centre it only has to clear the plug.
+//
+// Worth knowing what the ray does NOT say. Clear run straight back from the
+// module's face, sampled up it:
+//
+//     v      -12   -8    -4    0     +4    +8
+//     55 deg  3.0  4.2   6.4   8.8  14.6  20.3
+//     70 deg  2.7  9.2   9.3  20.3  40.0  40.0
+//
+// So at 55 the wire garage is real but thinner and higher up: 15 mm of run
+// exists above about v = +4.5, against v = -2 at 70. The bundle has to rise
+// rather than go straight back.
+CONN_NEED = CONN_H + PLUG_H;
 
 // Headroom: the cable comes off the hat's socket and turns upward, and it wants
 // about 20 mm above the hat before it is bent comfortably. Measured on the real
