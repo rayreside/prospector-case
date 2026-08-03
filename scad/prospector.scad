@@ -59,6 +59,20 @@ CONN_SLOT_U = 14.00;  // how far in from the left pocket edge
 // Mirrored on the right as well. Nothing is behind it there -- it is purely
 // to open the seat up so the hat can be got past it on the way in.
 CONN_SLOT_BOTH = true;
+
+// The display's screws run along the screen normal, which at 70 degrees is
+// only 20 degrees off horizontal -- so a driver has to come in almost level
+// from behind, and the case floor cuts that line off before it reaches the
+// back opening. These are the two channels that let it through, bored on the
+// screw axis from just behind each lower boss. They come out as long shallow
+// ellipses in the underside, and using them means tipping the case up.
+LCD_ACCESS = true;
+ACCESS_D   = 3.60;    // enough for a small cross-head driver shaft
+
+// Below the module the seat is carrying nothing -- the lower bosses sit at
+// v = -11.285 and everything under them is there only because the ring was
+// drawn at a uniform width. Opened out between them.
+SEAT_OPEN_BOTTOM = true;
 CAP_T     = 1.60;     // rear cap plate
 CAP_SCR_X = 16.00;    // rear cap screws, clear of the hat at +/-11.25
 CAP_SCR_Z = 7.00;
@@ -473,6 +487,28 @@ module bosses() {
                 cylinder(d = BOSS_D, h = WALL + BOSS_H);
 }
 
+// Bored from behind the boss, not through it: coaxial with the screw but
+// starting past the head, so the boss keeps its 2.2 hole and its wall.
+module lcd_access() {
+    if (LCD_ACCESS)
+        for (sx = [-1, 1])
+            band_at(sx * HOLE_DX / 2, -HOLE_DY / 2, -WALL - BOSS_H - 0.5, 40);
+}
+
+module band_at(u, v, w0, len) {
+    translate([0, CY, CZ]) rotate([TILT, 0, 0])
+        translate([u, v, w0 - len]) cylinder(d = ACCESS_D, h = len);
+}
+
+module seat_bottom() {
+    if (SEAT_OPEN_BOTTOM) {
+        keep = HOLE_DX / 2 - BOSS_D / 2 - 1.0;      // stay clear of the bosses
+        translate([0, CY, CZ]) rotate([TILT, 0, 0])
+            translate([-keep, -POCK_H / 2, -WALL - BOSS_H - 1])
+                cube([2 * keep, POCK_H / 2 - SEAT, WALL + BOSS_H + 2]);
+    }
+}
+
 module screw_holes() {
     for (sx = [-1, 1], sy = [-1, 1])
         translate([0, CY, CZ]) rotate([TILT, 0, 0])
@@ -500,6 +536,8 @@ module shell() {
         }
         mcu_box();
         screw_holes();
+        lcd_access();
+        seat_bottom();
         cap_screws();
         hat_screws();
         translate([-100, DEPTH - CAP_T, -100]) cube([200, CAP_T + 60, 200]);
