@@ -16,7 +16,7 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **43.0 x 37.0** |
 | Enclosed | 59.86 cm3 | **45.16 cm3** |
-| Plastic | 15.92 cm3 | **11.60 cm3** |
+| Plastic | 15.92 cm3 | **11.74 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 1 mm shorter, 25% less enclosed volume, 27% less
@@ -106,7 +106,7 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 |---|---|
 | display | drops in from the front, lip in the counterbore, 4 x M2 from inside into its own standoffs |
 | rear cap | 2 x M2.5 into posts at x = +/-16, from outside |
-| hat | pads at its own hole positions, two hooks over the bare board south of the XIAO |
+| hat | pads at its own hole positions, rails along both side kerbs; screws optional |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
 
 The display goes in from the **front** and its own lip lands on the case — not
@@ -121,17 +121,20 @@ own mounting bosses. At the 2.50 it started at, all four holes fell inside the
 connector window with nothing under them — a case the display could not be
 screwed to, invisible in every render.
 
-The hat is **trapped, not bolted**, and that is forced rather than chosen. Its
-mounting holes are known -- 17.10 apart, 2.65 from the south edge -- but the
-screws would be vertical with the display directly overhead, and no face of the
-case looks along that axis, so a driver cannot reach them once assembled.
-Bottom access holes do not rescue it either: upstream's work because its LCD
-screws run along the screen normal, which points at an open face. These do not.
+The hat slides in from the back under **rails along the top of both side
+kerbs**, and lands on pads at its own hole positions. The kerbs already stood
+0.9 mm proud of the board, so the rails cost 1.2 mm of height and 99 mm3.
 
-So the hat rests on pads at its own hole positions, which set its height, slides
-forward under two hooks, and the rear cap closes behind it. The hooks land on
-the bare board south of the XIAO -- the one part of the hat with nothing
-mounted on it. The USB-C through the cap slot pins the far end.
+Rails, not hooks, and the difference is the direction of travel. An earlier
+version reached back over the hat's front corners, which meant the board had to
+slide *into* them -- and everything ahead of it blocked that: first a front
+kerb 0.9 taller than the board, then a shelf under its bare strip that let it
+move 0.3 mm before fouling. A rail runs along the way the hat is going.
+
+The two screw pads stay and the screws still work -- with the seat cut back to
+a rim, a driver comes straight down through the display opening onto them, so
+long as the hat goes in before the display. They are belt and braces now
+rather than the retention.
 
 **The XIAO and its USB-C hang underneath**, propping the board 4.30 mm above the
 bottom of the stack. Missed on the first test print, where the pads had been

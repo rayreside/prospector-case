@@ -93,7 +93,7 @@ CAP_POST_D = 6.00;
 CAP_PILOT = 2.10;     // M2.5 forming its own thread in the post
 CAP_POST_L = 6.00;
 KERB      = 1.50;     // wall of the tray that locates the hat
-KERB_H    = 2.50;     // how far it rises past the hat's underside
+KERB_H    = 3.10;     // enough for the rail to sit clear above the board
 // The hat's own mounting holes. Centre-to-centre comes from two straddling
 // spans -- 19.2 over the far walls and 15.0 between the near ones -- which
 // average to the centre distance and cancel the hole diameter. Their half
@@ -113,14 +113,13 @@ HAT_SCR_DY = 2.65;    // up from the south edge: 1.60 to the near wall + 1.05
 HAT_SCR_D  = 1.70;    // M2 forming its own thread; the board's hole is 2.10
 HAT_POST_D = 4.50;
 
-// Off, and superseded. Hooks existed because the hat's screws looked
-// unreachable, which was true only while the seat was a 7.25 ring. With the
-// seat cut back to a rim the driver comes straight down through the display
-// opening: from either screw a vertical line crosses the seat plane at
-// v = +3.99, well inside the 36.2 x 28.2 window. So the hat is bolted, and the
-// order is hat first, display second. That also takes the hooks' overhang out
-// of the print.
-MCU_HOOKS = false;
+// Rails along the TOP OF THE SIDE KERBS, which is the version that works. The
+// earlier hooks reached back over the hat's front corners, so the board had to
+// slide into them, and everything ahead of it blocked that. A rail runs along
+// the direction of travel instead: the hat goes in from the back, passes under
+// both rails the whole way, and lands on its pads. The kerbs already stood
+// 0.9 proud of the board, which is where the idea came from.
+MCU_HOOKS = true;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
@@ -446,18 +445,15 @@ module mcu_tray() {
 // hanging off a coplanar contact with the tray's side kerb -- two non-manifold
 // edges, and a hook attached to the case by nothing but a shared face.
 module mcu_hooks() {
-    y0 = MCU_Y - KERB;                       // clear in front of the hat
-    y1 = MCU_Y;                              // stops at its front face
-    y2 = y1 + MCU_CLR + HOOK_D;              // and reaches back over the board
-    // 0.1 above the board's own envelope: landing exactly on it is coplanar,
-    // and coplanar is the case a union handles worst.
-    zt = PCB_Z + PCB_T + 2 * MCU_CLR + 0.1;
+    zt = PCB_Z + PCB_T + MCU_CLR;            // just clear of the board
+    hx = MCU_DX / 2 + MCU_CLR;
     if (MCU_HOOKS)
         for (sx = [-1, 1])
-            translate([sx * (MCU_DX / 2 + MCU_CLR) - (sx > 0 ? HOOK_W : 0), 0, 0])
-                rotate([90, 0, 90]) linear_extrude(HOOK_W)
-                    polygon([[y0, FLOOR - 0.2], [y1, FLOOR - 0.2], [y1, zt],
-                             [y2, zt], [y2, zt + HOOK_T], [y0, zt + HOOK_T]]);
+            // Runs 0.5 into the kerb rather than stopping flush against it.
+            // Flush is a coplanar contact, and the last time a retention
+            // feature met the tray that way it came out as its own shell.
+            translate([sx > 0 ? hx - HOOK_D : -hx - 0.5, MCU_Y, zt])
+                cube([HOOK_D + 0.5, MCU_DY + 2 * MCU_CLR, HOOK_T]);
 }
 
 module hat_posts() {
