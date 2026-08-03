@@ -46,7 +46,12 @@ BACK_R    = 3.00;     // rounding where the back wall meets desk and top
 // 2.50 it started at, all four of the module's holes fell inside the connector
 // window with no material under them -- a case the display could not be
 // screwed to, and nothing in a render would have said so.
-SEAT      = 7.25;     // ledge the module's back bears on, all round
+// The seat is no longer a ledge, because it was never doing the job of one:
+// the module front-loads and its lip lands in the counterbore, so nothing can
+// fall inward. All the ring was ever holding was the four bosses. What is left
+// is a thin rim and a pad at each boss to tie it to that rim.
+SEAT      = 1.60;     // rim around the pocket
+SEAT_PAD  = 8.00;     // square of seat kept at each boss
 BOSS_D    = 5.00;     // boss around each screw, on the cavity side
 BOSS_H    = 2.40;     // how far it stands into the cavity
 SCREW_D   = 2.20;     // clearance for M2
@@ -72,7 +77,9 @@ ACCESS_D   = 3.60;    // enough for a small cross-head driver shaft
 // Below the module the seat is carrying nothing -- the lower bosses sit at
 // v = -11.285 and everything under them is there only because the ring was
 // drawn at a uniform width. Opened out between them.
-SEAT_OPEN_BOTTOM = true;
+// Superseded: the window now reaches the rim on every side, so there is no
+// lower band left to open out.
+SEAT_OPEN_BOTTOM = false;
 CAP_T     = 1.60;     // rear cap plate
 CAP_SCR_X = 16.00;    // rear cap screws, clear of the hat at +/-11.25
 CAP_SCR_Z = 7.00;
@@ -94,22 +101,21 @@ KERB_H    = 2.50;     // how far it rises past the hat's underside
 // XIAO's 21), so a centre has to fall between 1.05 and 4.95 of the south edge
 // -- which is how a mis-keyed 16 for the near-wall distance was caught: from
 // either edge it put the hole inside the XIAO's footprint.
-// Pilot holes only. The pads below stay either way -- they set the board's
-// height -- but there is no way to drive a screw into them once assembled.
-HAT_SCREWS = false;
+// On. Reachable through the display opening as long as the hat goes in first.
+HAT_SCREWS = true;
 HAT_SCR_DX = 17.10;   // centre to centre, measured
 HAT_SCR_DY = 2.65;    // up from the south edge: 1.60 to the near wall + 1.05
 HAT_SCR_D  = 1.70;    // M2 forming its own thread; the board's hole is 2.10
 HAT_POST_D = 4.50;
 
-// Back on, and this time bearing where they should. The hat's screws cannot be
-// reached once the case is together -- they are vertical with the display
-// directly overhead, and no face of the case looks along that axis. So the hat
-// is trapped rather than bolted: it rests on pads at its own hole positions,
-// slides forward under these hooks, and the rear cap closes behind it. The
-// hooks land on the bare board south of the XIAO, which is the one part of the
-// hat with nothing mounted on it.
-MCU_HOOKS = true;
+// Off, and superseded. Hooks existed because the hat's screws looked
+// unreachable, which was true only while the seat was a 7.25 ring. With the
+// seat cut back to a rim the driver comes straight down through the display
+// opening: from either screw a vertical line crosses the seat plane at
+// v = +3.99, well inside the 36.2 x 28.2 window. So the hat is bolted, and the
+// order is hat first, display second. That also takes the hooks' overhang out
+// of the print.
+MCU_HOOKS = false;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
@@ -323,8 +329,15 @@ module outer() {
 module hollow() {
     band(POCK_W, POCK_H, POCK_R, 0, DISP_T - LIP_T);     // the module's body
     band(BORE_W, BORE_H, BORE_R, DISP_T - LIP_T, W_RIM + 1);   // its lip
-    band(POCK_W - 2 * SEAT, POCK_H - 2 * SEAT,           // connector window
-         max(POCK_R - SEAT, 0.5), -WALL - BOSS_H - 1, 1);
+    difference() {                                       // opened-out window
+        band(POCK_W - 2 * SEAT, POCK_H - 2 * SEAT,
+             max(POCK_R - SEAT, 0.5), -WALL - BOSS_H - 1, 1);
+        for (sx = [-1, 1], sy = [-1, 1])                  // keep the boss pads
+            translate([0, CY, CZ]) rotate([TILT, 0, 0])
+                translate([sx * HOLE_DX / 2 - SEAT_PAD / 2,
+                           sy * HOLE_DY / 2 - SEAT_PAD / 2, -WALL - BOSS_H - 2])
+                    cube([SEAT_PAD, SEAT_PAD, WALL + BOSS_H + 4]);
+    }
     for (sx = CONN_SLOT_BOTH ? [-1, 1] : [-1])            // socket relief
         translate([0, CY, CZ]) rotate([TILT, 0, 0])
             translate([sx < 0 ? -POCK_W / 2 : POCK_W / 2 - CONN_SLOT_U,
@@ -461,14 +474,18 @@ module cap() {
 
 // The hat, flat against the rear cap, XIAO down so its socket faces up into
 // the cavity and the USB-C sits at the bottom of the stack.
+// The full brick, deliberately -- this is the room the assembly needs to get
+// in, not the room it occupies once seated. Carving only the real profile left
+// a shelf under the hat's bare strip at z = 6.0 with the XIAO hanging to 6.3:
+// the whole thing could travel 0.3 mm before fouling, so it could only ever be
+// dropped straight down, and the hooks need it to slide.
+//
+// The thin profile still governs the clearance checks -- see hat_top_at().
+// Insertion volume and occupied volume are different things and the model now
+// keeps them apart.
 module mcu_box() {
-    w = MCU_DX + 2 * MCU_CLR;
-    // bare board over the whole footprint
-    translate([-w / 2, MCU_Y, PCB_Z - MCU_CLR])
-        cube([w, MCU_DY + 2 * MCU_CLR, PCB_T + 2 * MCU_CLR]);
-    // XIAO below and socket above, north of the strip
-    translate([-w / 2, TALL_Y - MCU_CLR, MCU_Z])
-        cube([w, MCU_Y + MCU_CLR + MCU_DY - TALL_Y + 2 * MCU_CLR, MCU_DZ]);
+    translate([-(MCU_DX + 2 * MCU_CLR) / 2, MCU_Y, MCU_Z])
+        cube([MCU_DX + 2 * MCU_CLR, MCU_DY + 2 * MCU_CLR, MCU_DZ]);
 }
 
 // The front frame is part of the shell, not a separate ring. LIP is how far it
@@ -523,14 +540,21 @@ module screw_holes() {
 // all silently vanished -- the volume came back byte-identical to the build
 // without them, which is the only reason it was caught.
 module shell() {
+    // hat_screws() comes off the whole assembly at the end. Subtracted inside,
+    // it bored the floor before the pads were unioned back on, and the pads
+    // then capped the hole -- leaving a sealed 1.7 x 0.8 void in the floor
+    // under each one, which shows up as two extra shells and nothing else.
+    difference() {
+    union() {
+    // The pads and the hooks go back on AFTER the insertion volume is carved,
+    // because both of them deliberately stand inside it -- that is what makes
+    // them retention rather than decoration.
+    intersection() { union() { hat_posts(); mcu_hooks(); } outer(); }
     difference() {
         union() {
             difference() { outer(); hollow(); }
             intersection() {
-                union() {
-                    bosses(); mcu_tray_placed(); cap_posts(); tie_posts();
-                    mcu_hooks(); hat_posts();
-                }
+                union() { bosses(); mcu_tray_placed(); cap_posts(); tie_posts(); }
                 outer();
             }
         }
@@ -539,8 +563,10 @@ module shell() {
         lcd_access();
         seat_bottom();
         cap_screws();
-        hat_screws();
         translate([-100, DEPTH - CAP_T, -100]) cube([200, CAP_T + 60, 200]);
+    }
+    }
+    hat_screws();
     }
 }
 
