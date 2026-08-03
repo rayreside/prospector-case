@@ -187,6 +187,13 @@ MCU_DZ    = MCU_H;
 POCK_W = DISP_W + 2 * DISP_CLR;
 POCK_H = DISP_H + 2 * DISP_CLR;
 POCK_R = DISP_R + DISP_CLR;
+// The counterbore recessed the module's lip so it finished flush, and left a
+// ring only 0.85 wide by 0.80 deep standing around it -- two extrusion widths
+// and four layers, which does not print. Off: the front is one flat face with
+// the pocket's opening in it, the lip lands on that face and stands 0.80 proud,
+// and the material around the opening becomes the full 1.7 bezel instead of a
+// fragile ledge. Upstream's is flush, but its ring is 0.835 and no better.
+LIP_BORE = false;
 BORE_W = LIP_W + 2 * LIP_CLR;         // counterbore the lip seats in
 BORE_H = LIP_H + 2 * LIP_CLR;
 BORE_R = DISP_R + (LIP_W - DISP_W) / 2;
@@ -195,9 +202,13 @@ RIM_MIN = 0.85;                       // material left around the counterbore
 // the lip's counterbore leaves standing. Upstream keeps 0.835 mm around its
 // counterbore, and that ring is only LIP_T deep, so it is a lip rather than a
 // wall.
-SEC_W  = max(POCK_W + 2 * BEZEL, BORE_W + 2 * RIM_MIN);
-SEC_H  = max(POCK_H + 2 * BEZEL, BORE_H + 2 * RIM_MIN);
-W_RIM  = DISP_T;                      // the lip's face is flush with the rim
+SEC_W  = LIP_BORE ? max(POCK_W + 2 * BEZEL, BORE_W + 2 * RIM_MIN)
+                  : POCK_W + 2 * BEZEL;
+SEC_H  = LIP_BORE ? max(POCK_H + 2 * BEZEL, BORE_H + 2 * RIM_MIN)
+                  : POCK_H + 2 * BEZEL;
+// Flush with the rim if it is recessed; otherwise the face sits at the lip's
+// underside and the lip stands on it.
+W_RIM  = LIP_BORE ? DISP_T : DISP_T - LIP_T;
 W_BACK = -40;                         // prism runs well past the trim planes
 
 // Frontmost point of the case at y = 0; pocket's lowest point at DISP_LIFT.
@@ -425,8 +436,9 @@ module outer() {
 // the full pocket width, so its module is only supported top and bottom --
 // a ring is stiffer for the same clearance.
 module hollow() {
-    band(POCK_W, POCK_H, POCK_R, 0, DISP_T - LIP_T);     // the module's body
-    band(BORE_W, BORE_H, BORE_R, DISP_T - LIP_T, W_RIM + 1);   // its lip
+    band(POCK_W, POCK_H, POCK_R, 0, DISP_T - LIP_T + 1); // the module's body
+    if (LIP_BORE)
+        band(BORE_W, BORE_H, BORE_R, DISP_T - LIP_T, W_RIM + 1);
     difference() {                                       // opened-out window
         band(POCK_W - 2 * SEAT, POCK_H - 2 * SEAT,
              max(POCK_R - SEAT, 0.5), -WALL - BOSS_H - 1, 1);

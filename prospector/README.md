@@ -14,19 +14,26 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 
 | | upstream, no sensor | this |
 |---|---|---|
-| Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **43.0 x 37.0** |
-| Enclosed | 59.86 cm3 | **45.16 cm3** |
-| Plastic | 15.92 cm3 | **12.82 cm3** |
+| Envelope | 43.2 x 51.4 x 38.0 | **42.8** x **43.0 x 36.1** |
+| Enclosed | 59.86 cm3 | **43.79 cm3** |
+| Plastic | 15.92 cm3 | **12.38 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 1 mm shorter, 25% less enclosed volume, 27% less
 filament, and the screen keeps the upstream 55 degrees. Both parts watertight,
 one shell each, zero boundary edges.
 
-The width does not move and cannot: it is the display's lip counterbore plus
-the ring left standing around it. Everything saved is depth, and it comes from
-folding the boards together instead of putting them at opposite corners of an
-empty box.
+The width is the module's pocket plus a 1.7 bezel and cannot go below that.
+Everything else saved is depth, and it comes from folding the boards together
+instead of putting them at opposite corners of an empty box.
+
+**The display face is flat.** `LIP_BORE` would recess the module's lip so it
+finished flush, as upstream does, but that leaves a ring only 0.85 wide by
+0.80 deep standing around it -- two extrusion widths and four layers, and it
+does not print. Off, the face is one plane with the pocket's opening in it: the
+lip lands on that face and stands 0.80 proud, and the material around the
+opening is the full 1.7 bezel rather than a fragile ledge. 0.73 mm of case
+shows around the lip, against upstream's 0.835.
 
 ## The three clearances
 
