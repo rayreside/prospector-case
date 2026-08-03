@@ -76,6 +76,7 @@ CONN_SLOT_U = 14.00;  // how far in from the left pocket edge
 // Mirrored on the right as well. Nothing is behind it there -- it is purely
 // to open the seat up so the hat can be got past it on the way in.
 CONN_SLOT_BOTH = true;
+CONN_SLOT_OVER = 0.60; // past the pocket wall, leaving 1.1 of rim
 
 // The display's screws run along the screen normal, which at 70 degrees is
 // only 20 degrees off horizontal -- so a driver has to come in almost level
@@ -146,7 +147,7 @@ MCU_HOOKS = false;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
-TIE_POSTS = true;     // a pair of posts to zip-tie the bundle down to
+TIE_POSTS = false;    // a pair of posts to zip-tie the bundle down to
 TIE_X     = 7.00;
 TIE_D     = 3.00;
 TIE_H     = 5.00;
@@ -450,16 +451,27 @@ module hollow() {
     }
     for (sx = CONN_SLOT_BOTH ? [-1, 1] : [-1])            // socket relief
         translate([0, CY, CZ]) rotate([TILT, 0, 0])
-            translate([sx < 0 ? -POCK_W / 2 : POCK_W / 2 - CONN_SLOT_U,
+            // Overruns the pocket wall by CONN_SLOT_OVER. Landing exactly on
+            // it put the slot's side face and the pocket's side face in the
+            // same plane, which is where the last self-intersections were.
+            translate([sx < 0 ? -POCK_W / 2 - CONN_SLOT_OVER
+                              : POCK_W / 2 - CONN_SLOT_U,
                        -CONN_SLOT_V / 2, -WALL - BOSS_H - 1])
-                cube([CONN_SLOT_U, CONN_SLOT_V, WALL + BOSS_H + 2]);
+                cube([CONN_SLOT_U + CONN_SLOT_OVER, CONN_SLOT_V,
+                      WALL + BOSS_H + 2]);
     intersection() {                                      // main cavity
         band(SEC_W - 2 * WALL, SEC_H + DROP - 2 * WALL, RIM_R - WALL,
              W_BACK, -WALL, -DROP / 2);
         // Past the back, not up to it. Ending the cavity on the same plane the
         // shell is cut on left the two coplanar, and the back came out closed:
         // a +y face of 825 mm2 where there should have been a ring of about 90.
-        trim(DEPTH + 1, WALL, max(BACK_R - WALL, 0.5), CH_DROP);
+        // Past the cap's inner face, not level with it. The cap carries the
+        // roof now, so the shell must have no material there at all -- but
+        // asking two trims with different corner radii to land on the same
+        // surface left paper-thin slivers instead of nothing, and 219
+        // self-intersecting triangle pairs with them. Let the cavity overrun
+        // and let cap_solid() alone define where the shell stops.
+        trim(DEPTH + 1, WALL, max(BACK_R - WALL, 0.5), -0.5);
     }
 }
 
