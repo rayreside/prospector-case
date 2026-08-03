@@ -16,7 +16,7 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **43.0 x 37.0** |
 | Enclosed | 59.86 cm3 | **45.16 cm3** |
-| Plastic | 15.92 cm3 | **11.64 cm3** |
+| Plastic | 15.92 cm3 | **12.82 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 1 mm shorter, 25% less enclosed volume, 27% less
@@ -105,7 +105,7 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 | part | held by |
 |---|---|
 | display | drops in from the front, lip in the counterbore, 4 x M2 from inside into its own standoffs |
-| rear cap | 2 x M2.5 into posts at x = +/-16, from outside |
+| rear cap | 2 x M2.5 into posts at x = +/-16; carries the chamfered roof too |
 | hat | two M2 into pads at its own hole positions |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
 
@@ -120,6 +120,13 @@ The seat is 7.25 mm wide because that is what it takes to carry the module's
 own mounting bosses. At the 2.50 it started at, all four holes fell inside the
 connector window with nothing under them — a case the display could not be
 screwed to, invisible in every render.
+
+The cap is a **bent panel**: the vertical back and the chamfered roof in one
+piece. It has to be. The display's upper screws run along the screen normal,
+and with the roof fixed to the shell the driver's line is blocked by the roof's
+rear edge by 1.25 mm; taking the roof off with the cap clears it by 1.13. The
+alternative was access holes through a visible face. It is also much the larger
+surface, if it is going to carry anything printed on it.
 
 The hat drops onto pads at its own hole positions and takes two M2. With the
 seat cut back to a rim a driver comes straight down through the display
@@ -156,12 +163,16 @@ desk-down the bad orientation:
 
 | shell orientation | support | bed contact | height |
 |---|---|---|---|
-| **desk-down (0)** | **579 mm2** | **1842 mm2** | 38.7 |
+| **desk-down (0)** | **369 mm2** | **1462 mm2** | 36.9 |
 | front face down (110) | 988 mm2 | 361 mm2 | 42.6 |
 | back face down (-90) | 989 mm2 | 202 mm2 | 45.4 |
 
-Least support *and* five times the bed contact. All of its support is interior
-roof that nobody sees. The cap laid flat needs none.
+Least support *and* four times the bed contact. All of its support is interior
+roof that nobody sees.
+
+The cap prints **as modelled**, standing on its bottom edge. Every face is
+steeper than 45 degrees that way, so it needs 21 mm2 of support against 688
+laid flat -- but it stands 37 mm tall on 69 mm2 of contact, so give it a brim.
 
 The tool ignores shallow faces within 1 mm of the bed, which matters: without
 that the 0.80 mm counterbore ledge scores 153 mm2 against an orientation where

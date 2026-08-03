@@ -367,12 +367,25 @@ CH_M = (Z_DTB + WALL - CH_Z) / (Y_DTB - DEPTH);  // and clear of the display
 // y = +1.10 even at 55, so nothing of the display is touched.
 FRONT = 0;
 
-module trim(back, floor, r) {
+// CH_DROP is the vertical offset that corresponds to insetting the chamfer
+// perpendicularly by one wall. Without it the cavity's chamfer was written as
+// CH_Z + WALL + CH_M * (y - back) with back = DEPTH + 1, which put it 2.71 mm
+// ABOVE the outer skin instead of 2.39 below -- so the whole chamfered roof
+// had no material behind it and the top of the back was simply missing. It
+// looked like a panel that had not been designed yet.
+CH_DROP = WALL * sqrt(1 + CH_M * CH_M);
+CAP_DROP = CAP_T * sqrt(1 + CH_M * CH_M);
+
+// The chamfer line is always referenced to DEPTH, never to `back`, or moving
+// the back plane tilts the roof.
+function ch_at(y, drop) = CH_Z - drop + CH_M * (y - DEPTH);
+
+module trim(back, floor, r, drop = 0) {
     rotate([90, 0, 90]) linear_extrude(120, center = true)
         offset(r = r) offset(delta = -r)
             polygon(BACK_CHAMFER
-                ? [[FRONT, floor], [back, floor], [back, CH_Z + floor],
-                   [FRONT, CH_Z + floor + CH_M * (FRONT - back)]]
+                ? [[FRONT, floor], [back, floor], [back, ch_at(back, drop)],
+                   [FRONT, ch_at(FRONT, drop)]]
                 : [[FRONT, floor], [back, floor], [back, 60], [FRONT, 60]]);
 }
 
@@ -416,7 +429,7 @@ module hollow() {
         // Past the back, not up to it. Ending the cavity on the same plane the
         // shell is cut on left the two coplanar, and the back came out closed:
         // a +y face of 825 mm2 where there should have been a ring of about 90.
-        trim(DEPTH + 1, WALL, max(BACK_R - WALL, 0.5));
+        trim(DEPTH + 1, WALL, max(BACK_R - WALL, 0.5), CH_DROP);
     }
 }
 
@@ -525,12 +538,20 @@ module usb_slot() {
 // The back is where the case opens: it is the one face that is flat, and the
 // module has to go in from behind it because the front frame's lip is what
 // holds the module in.
+// The cap is the back AND the chamfered roof, as one bent panel. It has to be:
+// the display's upper screws run along the screen normal, and with a fixed
+// roof the driver's line clips the top edge of the back opening by about a
+// millimetre. Taking the roof off with the cap clears it, and avoids putting
+// access holes through a face that is on show.
+//
+// It is also the larger surface, which is the other thing it is wanted for.
+module cap_solid() {
+    difference() { outer(); trim(DEPTH - CAP_T, 0, BACK_R, CAP_DROP); }
+}
+
 module cap() {
     difference() {
-        intersection() {
-            outer();
-            translate([-100, DEPTH - CAP_T, -100]) cube([200, CAP_T, 200]);
-        }
+        cap_solid();
         usb_slot();
         cap_screws();
     }
@@ -627,7 +648,7 @@ module shell() {
         lcd_access();
         seat_bottom();
         cap_screws();
-        translate([-100, DEPTH - CAP_T, -100]) cube([200, CAP_T + 60, 200]);
+        cap_solid();
     }
     }
     hat_screws();
