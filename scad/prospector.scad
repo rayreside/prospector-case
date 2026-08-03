@@ -143,8 +143,12 @@ HAT_POST_D = 4.50;
 // undersides run the full 27.6 as horizontal ledges, which is 107 mm2 of
 // support for retention that is already covered. The geometry stays because
 // the idea is sound if the screws ever turn out not to be enough.
-MCU_HOOKS = false;
+MCU_HOOKS = true;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
+// Rails only need to reach back from the cap far enough to stop the hat's free
+// end lifting -- the two screws hold the front. Running them the full length
+// took them forward into the display's screw holes.
+RAIL_LEN  = 10.00;    // how far forward from the hat's back edge
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
 TIE_POSTS = false;    // a pair of posts to zip-tie the bundle down to
@@ -512,8 +516,9 @@ module mcu_hooks() {
             // Runs 0.5 into the kerb rather than stopping flush against it.
             // Flush is a coplanar contact, and the last time a retention
             // feature met the tray that way it came out as its own shell.
-            translate([sx > 0 ? hx - HOOK_D : -hx - 0.5, MCU_Y, zt])
-                cube([HOOK_D + 0.5, MCU_DY + 2 * MCU_CLR, HOOK_T]);
+            translate([sx > 0 ? hx - HOOK_D : -hx - 0.5,
+                       MCU_Y + MCU_DY + 2 * MCU_CLR - RAIL_LEN, zt])
+                cube([HOOK_D + 0.5, RAIL_LEN, HOOK_T]);
 }
 
 module hat_posts() {
