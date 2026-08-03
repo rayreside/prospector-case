@@ -327,13 +327,26 @@ Y_DTB = CY + POCK_H / 2 * cos(TILT);             // display's top-back corner
 Z_DTB = CZ + POCK_H / 2 * sin(TILT);
 CH_M = (Z_DTB + WALL - CH_Z) / (Y_DTB - DEPTH);  // and clear of the display
 
+// FRONT is the one that mattered and was missing. Below the display the case
+// still has to reach the desk, and the prism's cross-section was simply
+// extended down the screen plane to get there -- so the skirt leaned FORWARD
+// instead of dropping, by DROP * cos(TILT). At 70 that is 2.04 mm and easy to
+// miss; at 55 it is 7.10, and it was the entire reason a shallower screen
+// looked like it cost depth. It never did: the display's own geometry was
+// being blamed for an artefact of how the case was closed underneath.
+//
+// Cut it off vertically at the rim instead. CY is chosen so the front rim's
+// bottom corner sits at y = 0, and the module's own frontmost point is at
+// y = +1.10 even at 55, so nothing of the display is touched.
+FRONT = 0;
+
 module trim(back, floor, r) {
     rotate([90, 0, 90]) linear_extrude(120, center = true)
         offset(r = r) offset(delta = -r)
             polygon(BACK_CHAMFER
-                ? [[-60, floor], [back, floor], [back, CH_Z + floor],
-                   [-60, CH_Z + floor + CH_M * (-60 - back)]]
-                : [[-60, floor], [back, floor], [back, 60], [-60, 60]]);
+                ? [[FRONT, floor], [back, floor], [back, CH_Z + floor],
+                   [FRONT, CH_Z + floor + CH_M * (FRONT - back)]]
+                : [[FRONT, floor], [back, floor], [back, 60], [FRONT, 60]]);
 }
 
 /* ---------- the case ---------- */
