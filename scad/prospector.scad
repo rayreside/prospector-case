@@ -52,8 +52,13 @@ BACK_R    = 3.00;     // rounding where the back wall meets desk and top
 // is a thin rim and a pad at each boss to tie it to that rim.
 SEAT      = 1.60;     // rim around the pocket
 SEAT_PAD  = 8.00;     // square of seat kept at each boss
-BOSS_D    = 5.00;     // boss around each screw, on the cavity side
-BOSS_H    = 2.40;     // how far it stands into the cavity
+BOSS_D    = 5.00;     // material kept around each screw
+// Zero, and it should stay zero. The module brings its own standoffs, so the
+// seat only has to be thick enough to pass a screw -- upstream's is a plain
+// plate with holes and nothing more. A boss standing into the cavity just adds
+// its height to what the screw has to cross before it reaches the standoff,
+// and at 2.40 an M2 x 6 ran out of thread before it got there.
+BOSS_H    = 0.00;
 SCREW_D   = 2.20;     // clearance for M2
 
 // The socket's footprint on the module's back, which the seat has to be
@@ -72,7 +77,7 @@ CONN_SLOT_BOTH = true;
 // screw axis from just behind each lower boss. They come out as long shallow
 // ellipses in the underside, and using them means tipping the case up.
 LCD_ACCESS = true;
-ACCESS_D   = 3.60;    // enough for a small cross-head driver shaft
+ACCESS_D   = 5.00;    // 3.60 took a shaft but not a bit
 
 // Below the module the seat is carrying nothing -- the lower bosses sit at
 // v = -11.285 and everything under them is there only because the ring was
