@@ -14,12 +14,12 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 
 | | upstream, no sensor | this |
 |---|---|---|
-| Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **47.0** x 38.7 |
-| Enclosed | 59.86 cm3 | **51.00 cm3** |
-| Plastic | 15.92 cm3 | **12.72 cm3** |
+| Envelope | 43.2 x 51.4 x 38.0 | 43.2 x **45.0** x 38.7 |
+| Enclosed | 59.86 cm3 | **48.89 cm3** |
+| Plastic | 15.92 cm3 | **13.25 cm3** |
 | Parts | 3 | 2 |
 
-Same width, 8.5% shallower, 0.7 mm taller, 15% less enclosed volume, 20% less
+Same width, 12% shallower, 0.7 mm taller, 18% less enclosed volume, 17% less
 filament. Both parts watertight, one shell each, zero boundary edges.
 
 The width does not move and cannot: it is the display's lip counterbore plus
@@ -92,7 +92,7 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 |---|---|
 | display | drops in from the front, lip in the counterbore, 4 x M2 from inside into its own standoffs |
 | rear cap | 2 x M2.5 into posts at x = +/-16, from outside |
-| hat | tray on its measured 21.9 x 27.0 outline, two hooks over its front corners |
+| hat | pads at its own hole positions, two hooks over the bare board south of the XIAO |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
 
 The display goes in from the **front** and its own lip lands on the case — not
@@ -107,13 +107,25 @@ own mounting bosses. At the 2.50 it started at, all four holes fell inside the
 connector window with nothing under them — a case the display could not be
 screwed to, invisible in every render.
 
-The hat is held by **hooks rather than screws**, deliberately. Its two mounting
-holes are in the strip south of the XIAO and their spacing is not known, and a
-post in the wrong place fouls the board instead of holding it. Two tongues
-reach 1.5 mm back over its front corners; the hat goes in from the back, slides
-forward under them, and the rear cap closes behind it. Constrained in every
-direction without needing the holes at all, and the USB-C through the cap slot
-pins the far end. Costs 22 mm2 of extra support.
+The hat is **trapped, not bolted**, and that is forced rather than chosen. Its
+mounting holes are known -- 17.10 apart, 2.65 from the south edge -- but the
+screws would be vertical with the display directly overhead, and no face of the
+case looks along that axis, so a driver cannot reach them once assembled.
+Bottom access holes do not rescue it either: upstream's work because its LCD
+screws run along the screen normal, which points at an open face. These do not.
+
+So the hat rests on pads at its own hole positions, which set its height, slides
+forward under two hooks, and the rear cap closes behind it. The hooks land on
+the bare board south of the XIAO -- the one part of the hat with nothing
+mounted on it. The USB-C through the cap slot pins the far end.
+
+**The XIAO and its USB-C hang underneath**, propping the board 4.30 mm above the
+bottom of the stack. Missed on the first test print, where the pads had been
+drawn up to the stack's underside with no board there to meet them.
+
+The alternative, if a bolted hat is ever wanted, is to move the pads onto a
+tongue on the rear cap: the hat then bolts to the cap on the bench and the pair
+slide in together. One more feature, no more parts.
 
 > Anything added inside the shell has to be unioned **after** `hollow()` is
 > subtracted, or the cavity swallows it — built the wrong way round, the seat

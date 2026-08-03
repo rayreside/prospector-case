@@ -56,6 +56,9 @@ SCREW_D   = 2.20;     // clearance for M2
 // this is a generous slot out to the pocket edge rather than a fitted pocket.
 CONN_SLOT_V = 9.00;   // how tall a band it takes, centred on the module
 CONN_SLOT_U = 14.00;  // how far in from the left pocket edge
+// Mirrored on the right as well. Nothing is behind it there -- it is purely
+// to open the seat up so the hat can be got past it on the way in.
+CONN_SLOT_BOTH = true;
 CAP_T     = 1.60;     // rear cap plate
 CAP_SCR_X = 16.00;    // rear cap screws, clear of the hat at +/-11.25
 CAP_SCR_Z = 7.00;
@@ -77,12 +80,22 @@ KERB_H    = 2.50;     // how far it rises past the hat's underside
 // XIAO's 21), so a centre has to fall between 1.05 and 4.95 of the south edge
 // -- which is how a mis-keyed 16 for the near-wall distance was caught: from
 // either edge it put the hole inside the XIAO's footprint.
-HAT_SCREWS = true;
+// Pilot holes only. The pads below stay either way -- they set the board's
+// height -- but there is no way to drive a screw into them once assembled.
+HAT_SCREWS = false;
 HAT_SCR_DX = 17.10;   // centre to centre, measured
 HAT_SCR_DY = 2.65;    // up from the south edge: 1.60 to the near wall + 1.05
 HAT_SCR_D  = 1.70;    // M2 forming its own thread; the board's hole is 2.10
 HAT_POST_D = 4.50;
 
+// Back on, and this time bearing where they should. The hat's screws cannot be
+// reached once the case is together -- they are vertical with the display
+// directly overhead, and no face of the case looks along that axis. So the hat
+// is trapped rather than bolted: it rests on pads at its own hole positions,
+// slides forward under these hooks, and the rear cap closes behind it. The
+// hooks land on the bare board south of the XIAO, which is the one part of the
+// hat with nothing mounted on it.
+MCU_HOOKS = true;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
@@ -92,7 +105,7 @@ TIE_D     = 3.00;
 TIE_H     = 5.00;
 SLACK     = 3.00;     // cable room between the hat and the module's seat
 
-DEPTH     = 45.00;    // *** the size knob. Back wall at y = DEPTH.
+DEPTH     = 43.00;    // *** the size knob. Back wall at y = DEPTH.
 
 // Screen angle and display height are one decision, and 70 is the minimum of
 // the curve rather than a preference. Steepening the screen makes the display's
@@ -140,9 +153,22 @@ CY = SEC_H / 2 * cos(TILT) + W_RIM * sin(TILT);
 CZ = DISP_LIFT + POCK_H / 2 * sin(TILT);
 
 FLOOR = WALL;                         // inside face of the desk-side wall
-MCU_Z = FLOOR + MCU_LIFT;             // bottom of the hat
+MCU_Z = FLOOR + MCU_LIFT;             // bottom of the stack, the USB-C shell
+PCB_Z = MCU_Z + PCB_UP;               // the hat board itself, what screws to
+
 
 MCU_Y  = DEPTH - CAP_T - MCU_DY - 2 * MCU_CLR;  // hat's front face
+// The hat is not the solid brick it was modelled as. Its southern strip -- the
+// 6 mm past the XIAO that carries the mounting holes -- is bare board, 1.6
+// thick, while only the part with the XIAO beneath it and the socket above it
+// stands the full 9.82. Treating the whole thing as full height held the case
+// about 4 mm deeper than it needs to be, which is visible on the printed part
+// as room to push the hat further in.
+PCB_T = 1.60;         // *** ESTIMATED: hat board thickness
+STRIP = MCU_W - 21.0; // bare board south of the XIAO's 21 mm length
+TALL_Y = MCU_Y + MCU_CLR + STRIP;     // where the full-height part starts
+function hat_top_at(y) = y < TALL_Y ? PCB_Z + PCB_T : MCU_Z + MCU_DZ;
+
 
 // Distance of a point in the y-z plane from the module's back face, measured
 // along the screen normal. Positive is in front of the module, so anything
@@ -202,11 +228,11 @@ function z_top(y) = CZ + (SEC_H / 2 - WALL) * sin(TILT)
 // the underside of the display, whichever the hat meets first going up.
 function ceil_at(y) = min(z_top(y), pocket_z(y) - WALL);
 
-HAT_TOP = MCU_Z + MCU_DZ;
-HAT_YS  = [MCU_Y, MCU_Y + MCU_DY / 4, MCU_Y + MCU_DY / 2,
-           MCU_Y + 3 * MCU_DY / 4, MCU_Y + MCU_DY];
-MCU_FIT  = min([for (y = HAT_YS) ceil_at(y)]) - HAT_TOP;   // must clear it all
-WIRE_FIT = max([for (y = HAT_YS) ceil_at(y)]) - HAT_TOP;   // rise anywhere over it
+HAT_YS  = [for (i = [0 : 8]) MCU_Y + i * MCU_DY / 8];
+MCU_FIT  = min([for (y = HAT_YS) ceil_at(y) - hat_top_at(y)]);
+// The cable rises off the socket, which is on the full-height part, so the
+// headroom that matters is measured there and not over the bare strip.
+WIRE_FIT = max([for (y = HAT_YS) if (y >= TALL_Y) ceil_at(y) - hat_top_at(y)]);
 
 echo(str("section ", SEC_W, " x ", SEC_H, ", depth ", DEPTH,
          ", screen ", TILT, " deg, lift ", DISP_LIFT));
@@ -285,9 +311,11 @@ module hollow() {
     band(BORE_W, BORE_H, BORE_R, DISP_T - LIP_T, W_RIM + 1);   // its lip
     band(POCK_W - 2 * SEAT, POCK_H - 2 * SEAT,           // connector window
          max(POCK_R - SEAT, 0.5), -WALL - BOSS_H - 1, 1);
-    translate([0, CY, CZ]) rotate([TILT, 0, 0])            // socket relief
-        translate([-POCK_W / 2, -CONN_SLOT_V / 2, -WALL - BOSS_H - 1])
-            cube([CONN_SLOT_U, CONN_SLOT_V, WALL + BOSS_H + 2]);
+    for (sx = CONN_SLOT_BOTH ? [-1, 1] : [-1])            // socket relief
+        translate([0, CY, CZ]) rotate([TILT, 0, 0])
+            translate([sx < 0 ? -POCK_W / 2 : POCK_W / 2 - CONN_SLOT_U,
+                       -CONN_SLOT_V / 2, -WALL - BOSS_H - 1])
+                cube([CONN_SLOT_U, CONN_SLOT_V, WALL + BOSS_H + 2]);
     intersection() {                                      // main cavity
         band(SEC_W - 2 * WALL, SEC_H + DROP - 2 * WALL, RIM_R - WALL,
              W_BACK, -WALL, -DROP / 2);
@@ -309,7 +337,7 @@ module hollow() {
 module mcu_tray() {
     translate([0, MCU_Y - KERB, FLOOR - 0.2])
         cube([MCU_DX + 2 * MCU_CLR + 2 * KERB, MCU_DY + 2 * MCU_CLR + KERB,
-              MCU_LIFT + KERB_H + 0.2], center = false);
+              PCB_Z - FLOOR + KERB_H + 0.2], center = false);
 }
 
 // Two hooks over the hat's front corners, so it is held down as well as
@@ -320,8 +348,8 @@ module mcu_tray() {
 // which leaves it constrained in every direction without needing the holes at
 // all. The USB-C passing through the cap slot pins the far end.
 module mcu_hooks() {
-    hx = MCU_DX / 2 + MCU_CLR;
-    top = MCU_Z + MCU_DZ;
+    if (MCU_HOOKS)
+    let (hx = MCU_DX / 2 + MCU_CLR, top = PCB_Z + PCB_T + MCU_CLR)
     for (sx = [-1, 1])
         translate([sx * hx - (sx > 0 ? HOOK_W : 0), MCU_Y - KERB, FLOOR - 0.2]) {
             cube([HOOK_W, KERB + MCU_CLR, top - FLOOR + HOOK_T + 0.2]);
@@ -334,11 +362,10 @@ module mcu_hooks() {
 // proud so the board still sits flat on them rather than being lifted off the
 // tray floor.
 module hat_posts() {
-    if (HAT_SCREWS)
         for (sx = [-1, 1])
             translate([sx * HAT_SCR_DX / 2, MCU_Y + MCU_CLR + HAT_SCR_DY,
                        FLOOR - 0.2])
-                cylinder(d = HAT_POST_D, h = MCU_LIFT + 0.2);
+                cylinder(d = HAT_POST_D, h = PCB_Z - FLOOR + 0.2);
 }
 
 module hat_screws() {
@@ -346,7 +373,7 @@ module hat_screws() {
         for (sx = [-1, 1])
             translate([sx * HAT_SCR_DX / 2, MCU_Y + MCU_CLR + HAT_SCR_DY,
                        FLOOR - 1])
-                cylinder(d = HAT_SCR_D, h = MCU_LIFT + 6);
+                cylinder(d = HAT_SCR_D, h = PCB_Z - FLOOR + 1.5);
 }
 
 module mcu_tray_placed() {
@@ -412,8 +439,13 @@ module cap() {
 // The hat, flat against the rear cap, XIAO down so its socket faces up into
 // the cavity and the USB-C sits at the bottom of the stack.
 module mcu_box() {
-    translate([0, MCU_Y + MCU_CLR + MCU_DY / 2, MCU_Z + MCU_DZ / 2])
-        cube([MCU_DX + 2 * MCU_CLR, MCU_DY + 2 * MCU_CLR, MCU_DZ], center = true);
+    w = MCU_DX + 2 * MCU_CLR;
+    // bare board over the whole footprint
+    translate([-w / 2, MCU_Y, PCB_Z - MCU_CLR])
+        cube([w, MCU_DY + 2 * MCU_CLR, PCB_T + 2 * MCU_CLR]);
+    // XIAO below and socket above, north of the strip
+    translate([-w / 2, TALL_Y - MCU_CLR, MCU_Z])
+        cube([w, MCU_Y + MCU_CLR + MCU_DY - TALL_Y + 2 * MCU_CLR, MCU_DZ]);
 }
 
 // The front frame is part of the shell, not a separate ring. LIP is how far it

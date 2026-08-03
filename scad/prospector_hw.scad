@@ -41,6 +41,11 @@ PLUG_H    = 4.00;     // *** ESTIMATE. How much further a seated plug reaches.
 MCU_W     = 27.00;    // the long axis, the one the USB-C exits along
 MCU_D     = 21.90;
 MCU_H     = 9.82;     // whole stack, USB-C shell to the hat's socket
+// The XIAO and its USB-C sit UNDERNEATH the hat once the assembly is inverted,
+// so the hat's board is propped this far above the bottom of the stack. Found
+// on the first test print: the screw posts had been drawn up to the stack's
+// underside, where there is no board to meet them.
+PCB_UP    = 4.30;     // stack bottom to the hat board's underside
 MCU_CLR   = 0.30;
 USB_W     = 9.50;     // upstream slot, which fits the plug shell with clearance
 USB_H     = 3.75;
