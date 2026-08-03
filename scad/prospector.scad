@@ -14,18 +14,25 @@
 // back wall forward lowers the case at the same time as it shortens it,
 // because the top face slopes back and up.
 //
-// PRINTING. Desk-down, as modelled, and the cap flat. Measured rather than
-// reasoned about, with tools/overhang.py: desk-down needs 557 mm2 of support
-// against 888 for front-face-down and 891 for back-down, and it puts 1842 mm2
-// on the bed where the others manage 361 and 202. All of its support is the
-// interior roof, which nobody sees. Upstream's body needs support too.
+// PRINTING. Shell desk-down as modelled; cap standing on its bottom edge, with
+// a brim. Measured with tools/overhang.py, not reasoned about:
+//
+//     shell   desk-down     365 mm2 support, 1462 on the bed
+//             front down    727                  0
+//             back down     884                121
+//     cap     as modelled    21 mm2 support,   69 on the bed  <- brim it
+//             laid flat     691                  0
+//
+// All the shell's support is interior roof that nobody sees.
 //
 // WHAT SETS THE SIZE. Not the walls and not the display -- the hat. It is 27
 // long front to back and 9.8 tall, and the display's back plane has to climb
-// over it before the case can end, which is why the screen is at 70 here and
-// not the upstream 55: at 55 the case comes out bigger than upstream.
-// Three clearances gate the depth and all three are echoed on every build.
-// PLUG_H is the only estimate left; everything else is measured.
+// over it before the case can end. Three clearances gate the depth and all
+// three are echoed on every build.
+//
+// The screen is at the upstream 55 and costs nothing for it. For a long time
+// this file claimed a shallower screen bought depth back; that was three
+// separate modelling faults, and prospector/README.md records them.
 
 /* [What to build] */
 part  = "all";        // all | shell | cap
@@ -93,12 +100,14 @@ CAP_SCR_Z = 7.00;
 // behind -- so a screw that "goes straight through" is the pilot being loose,
 // not the cap being wrong.
 //
-// Thread-forming into printed plastic wants about 0.78 of the major diameter.
-// 2.10 for an M2.5 is 0.84, slack before print tolerance is even counted; the
-// hat's pads already use 0.85 of M2 and hold, but they take no load. These do.
-CAP_SCREW = 2.50;                     // set to 2.00 for M2
+// These are the same M2 as the display's, which is the whole explanation: the
+// pilot was 2.10, above the screw's own major diameter, so there was nothing
+// for it to cut into. It was sized for the M2.5 the upstream BOM lists.
+//
+// Thread-forming into printed plastic wants about 0.8 of the major diameter.
+CAP_SCREW = 2.00;                     // M2, as the display uses
 CAP_SCR_D = CAP_SCREW + 0.20;         // clearance through the cap
-CAP_PILOT = CAP_SCREW * 0.78;         // 1.95 for M2.5, 1.56 for M2
+CAP_PILOT = CAP_SCREW * 0.80;         // 1.60 for M2, 2.00 for M2.5
 CAP_POST_D = 6.00;
 CAP_POST_L = 6.00;
 KERB      = 1.50;     // wall of the tray that locates the hat

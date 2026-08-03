@@ -105,7 +105,8 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 | part | held by |
 |---|---|
 | display | drops in from the front, lip in the counterbore, 4 x M2 from inside into its own standoffs |
-| rear cap | 2 x M2.5 into posts at x = +/-16; carries the chamfered roof too. `CAP_SCREW = 2.00` for M2 |
+
+| rear cap | 2 x M2 into posts at x = +/-16; carries the chamfered roof too |
 | hat | two M2 into pads at its own hole positions |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
 
