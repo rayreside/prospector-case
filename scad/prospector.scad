@@ -88,9 +88,18 @@ SEAT_OPEN_BOTTOM = false;
 CAP_T     = 1.60;     // rear cap plate
 CAP_SCR_X = 16.00;    // rear cap screws, clear of the hat at +/-11.25
 CAP_SCR_Z = 7.00;
-CAP_SCR_D = 2.70;     // clearance for M2.5
+// One number picks the rear-cap screw and the other two follow. The cap's hole
+// is clearance -- the screw is meant to pass through it and bite in the post
+// behind -- so a screw that "goes straight through" is the pilot being loose,
+// not the cap being wrong.
+//
+// Thread-forming into printed plastic wants about 0.78 of the major diameter.
+// 2.10 for an M2.5 is 0.84, slack before print tolerance is even counted; the
+// hat's pads already use 0.85 of M2 and hold, but they take no load. These do.
+CAP_SCREW = 2.50;                     // set to 2.00 for M2
+CAP_SCR_D = CAP_SCREW + 0.20;         // clearance through the cap
+CAP_PILOT = CAP_SCREW * 0.78;         // 1.95 for M2.5, 1.56 for M2
 CAP_POST_D = 6.00;
-CAP_PILOT = 2.10;     // M2.5 forming its own thread in the post
 CAP_POST_L = 6.00;
 KERB      = 1.50;     // wall of the tray that locates the hat
 KERB_H    = 3.10;     // enough for the rail to sit clear above the board
