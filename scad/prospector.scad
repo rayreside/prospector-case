@@ -257,8 +257,23 @@ function z_top(y) = CZ + (SEC_H / 2 - WALL) * sin(TILT)
     + ((CY + (SEC_H / 2 - WALL) * cos(TILT) - y) / sin(TILT)) * cos(TILT);
 
 // The cavity's ceiling at abscissa y: the lower of the case's own top face and
-// the underside of the display, whichever the hat meets first going up.
-function ceil_at(y) = min(z_top(y), pocket_z(y) - WALL);
+// whatever the display presents, going straight up.
+//
+// Two errors lived here, in opposite directions and both worth naming. It
+// subtracted WALL vertically, but the seat's thickness is measured along the
+// screen normal -- vertically that is WALL / cos(TILT), 2.79 at 55 degrees,
+// not 1.6. And more importantly it assumed a seat there at all: since the seat
+// was cut back to a rim, the window is open over |v| <= POCK_H/2 - SEAT and
+// what is overhead is the module itself, with no plate under it.
+//
+// Over the hat's front corner at 55 degrees that is the difference between a
+// reported 0.99 of clearance and a real 2.59. The physical part showed the
+// space plainly; the model was subtracting a wall it no longer has.
+function seat_drop(y) =
+    let (zp = pocket_z(y),
+         v = (y - CY) * cos(TILT) + (zp - CZ) * sin(TILT))
+    abs(v) <= POCK_H / 2 - SEAT ? 0 : WALL / cos(TILT);
+function ceil_at(y) = min(z_top(y), pocket_z(y) - seat_drop(y));
 
 HAT_YS  = [for (i = [0 : 8]) MCU_Y + i * MCU_DY / 8];
 MCU_FIT  = min([for (y = HAT_YS) ceil_at(y) - hat_top_at(y)]);
