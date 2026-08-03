@@ -119,7 +119,12 @@ HAT_POST_D = 4.50;
 // the direction of travel instead: the hat goes in from the back, passes under
 // both rails the whole way, and lands on its pads. The kerbs already stood
 // 0.9 proud of the board, which is where the idea came from.
-MCU_HOOKS = true;
+//
+// OFF for now. The two screws hold the hat on their own, and the rails' 1.5 mm
+// undersides run the full 27.6 as horizontal ledges, which is 107 mm2 of
+// support for retention that is already covered. The geometry stays because
+// the idea is sound if the screws ever turn out not to be enough.
+MCU_HOOKS = false;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
