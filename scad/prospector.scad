@@ -189,9 +189,16 @@ MCU_Y  = DEPTH - CAP_T - MCU_DY - 2 * MCU_CLR;  // hat's front face
 // stands the full 9.82. Treating the whole thing as full height held the case
 // about 4 mm deeper than it needs to be, which is visible on the printed part
 // as room to push the hat further in.
-PCB_T = 1.60;         // *** ESTIMATED: hat board thickness
-STRIP = MCU_W - 21.0; // bare board south of the XIAO's 21 mm length
-TALL_Y = MCU_Y + MCU_CLR + STRIP;     // where the full-height part starts
+PCB_T  = 1.60;        // *** ESTIMATED: hat board thickness
+// What stands tall on the hat is the socket, not the XIAO -- the XIAO hangs
+// underneath and does not raise the top at all. So the profile steps up where
+// the socket starts, 7.10 from the south edge, measured. It was stepping up at
+// the XIAO's edge, 6.00, which is the wrong feature and 1.10 too early.
+//
+// Still conservative north of there: the socket is one connector, and this
+// treats everything past it as standing at full stack height.
+SOCKET_Y = 7.10;      // south edge of the hat to the near edge of the socket
+TALL_Y = MCU_Y + MCU_CLR + SOCKET_Y;
 function hat_top_at(y) = y < TALL_Y ? PCB_Z + PCB_T : MCU_Z + MCU_DZ;
 
 
