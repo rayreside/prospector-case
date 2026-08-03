@@ -334,9 +334,13 @@ module hollow() {
 // Overlapping the floor by 0.2 rather than sitting on it: a coplanar contact
 // is the awkward case for a union, and this one has to fuse or the tray comes
 // out as its own shell.
+// Sides and back only. A kerb across the front as well was 0.9 mm taller than
+// the board it was meant to guide, so the hat could neither slide forward under
+// the hooks nor drop in past them -- the hooks were real geometry that nothing
+// could ever reach. The hook towers are the front stop now.
 module mcu_tray() {
-    translate([0, MCU_Y - KERB, FLOOR - 0.2])
-        cube([MCU_DX + 2 * MCU_CLR + 2 * KERB, MCU_DY + 2 * MCU_CLR + KERB,
+    translate([0, MCU_Y, FLOOR - 0.2])
+        cube([MCU_DX + 2 * MCU_CLR + 2 * KERB, MCU_DY + 2 * MCU_CLR,
               PCB_Z - FLOOR + KERB_H + 0.2], center = false);
 }
 
@@ -347,20 +351,25 @@ module mcu_tray() {
 // the back, slides forward under these, and the rear cap closes behind it --
 // which leaves it constrained in every direction without needing the holes at
 // all. The USB-C passing through the cap slot pins the far end.
+// One L-shaped profile extruded across, not a tower cube plus a tongue cube.
+// Built from two cubes the pieces met on a plane, and the upper one ended up
+// hanging off a coplanar contact with the tray's side kerb -- two non-manifold
+// edges, and a hook attached to the case by nothing but a shared face.
 module mcu_hooks() {
+    y0 = MCU_Y - KERB;                       // clear in front of the hat
+    y1 = MCU_Y;                              // stops at its front face
+    y2 = y1 + MCU_CLR + HOOK_D;              // and reaches back over the board
+    // 0.1 above the board's own envelope: landing exactly on it is coplanar,
+    // and coplanar is the case a union handles worst.
+    zt = PCB_Z + PCB_T + 2 * MCU_CLR + 0.1;
     if (MCU_HOOKS)
-    let (hx = MCU_DX / 2 + MCU_CLR, top = PCB_Z + PCB_T + MCU_CLR)
-    for (sx = [-1, 1])
-        translate([sx * hx - (sx > 0 ? HOOK_W : 0), MCU_Y - KERB, FLOOR - 0.2]) {
-            cube([HOOK_W, KERB + MCU_CLR, top - FLOOR + HOOK_T + 0.2]);
-            translate([0, KERB + MCU_CLR, top - FLOOR + 0.2])
-                cube([HOOK_W, HOOK_D, HOOK_T]);
-        }
+        for (sx = [-1, 1])
+            translate([sx * (MCU_DX / 2 + MCU_CLR) - (sx > 0 ? HOOK_W : 0), 0, 0])
+                rotate([90, 0, 90]) linear_extrude(HOOK_W)
+                    polygon([[y0, FLOOR - 0.2], [y1, FLOOR - 0.2], [y1, zt],
+                             [y2, zt], [y2, zt + HOOK_T], [y0, zt + HOOK_T]]);
 }
 
-// Posts under the hat at its own mounting holes, standing exactly MCU_LIFT
-// proud so the board still sits flat on them rather than being lifted off the
-// tray floor.
 module hat_posts() {
         for (sx = [-1, 1])
             translate([sx * HAT_SCR_DX / 2, MCU_Y + MCU_CLR + HAT_SCR_DY,
