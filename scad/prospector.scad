@@ -108,10 +108,30 @@ CAP_SCR_Z = 7.00;
 // pilot was 2.10, above the screw's own major diameter, so there was nothing
 // for it to cut into. It was sized for the M2.5 the upstream BOM lists.
 //
-// Thread-forming into printed plastic wants about 0.8 of the major diameter.
+// Then it was 2.00 x 0.80 = 1.60, the textbook thread-forming pilot, and that
+// was too tight the other way -- 4.4 mm of thread to form at once, and the
+// driver cammed out of the head before the plate was down. The head then
+// crushed into 1.6 mm of plate, which is the same fault seen from the other
+// end rather than a second one.
+//
+// 1.70 is not a calculation. It is the pilot the hat's screws use, which is
+// the only one in this case that has actually been driven and not complained
+// about -- same screw, same plastic, same wall. Both now come off it.
+M2_PILOT  = 1.70;
 CAP_SCREW = 2.00;                     // M2, as the display uses
 CAP_SCR_D = CAP_SCREW + 0.20;         // clearance through the cap
-CAP_PILOT = CAP_SCREW * 0.80;         // 1.60 for M2, 2.00 for M2.5
+CAP_PILOT = M2_PILOT;
+// Peak torque is the pilot times how much thread is being formed at once, and
+// the second term was free to fix: the post's mouth is bored to clearance for
+// CAP_FREE first, so an M2 x 6 forms about 3.4 mm of thread instead of 4.4.
+// The lead-in also lets the screw find the hole square before it starts biting.
+CAP_FREE  = 1.00;
+// Where the head lands. A pan head wants the bore's lip broken and nothing
+// more -- take too much and the head ends up bearing on a narrow ring, which
+// is worse than the sharp edge. A countersunk head wants a real 90 degree seat.
+CAP_HEAD    = "pan";                  // pan | flat
+CAP_HEAD_D  = 3.80;                   // M2, either kind
+CAP_CSK     = CAP_HEAD == "flat" ? (CAP_HEAD_D - CAP_SCR_D) / 2 : 0.30;
 CAP_POST_D = 6.00;
 CAP_POST_L = 6.00;
 KERB      = 1.50;     // wall of the tray that locates the hat
@@ -132,7 +152,7 @@ KERB_H    = 3.10;     // enough for the rail to sit clear above the board
 HAT_SCREWS = true;
 HAT_SCR_DX = 17.10;   // centre to centre, measured
 HAT_SCR_DY = 2.65;    // up from the south edge: 1.60 to the near wall + 1.05
-HAT_SCR_D  = 1.70;    // M2 forming its own thread; the board's hole is 2.10
+HAT_SCR_D  = M2_PILOT; // M2 forming its own thread; the board's hole is 2.10
 HAT_POST_D = 4.50;
 
 // Rails along the TOP OF THE SIDE KERBS, which is the version that works. The
@@ -604,13 +624,19 @@ module cap_posts() {
 }
 
 module cap_screws() {
+    y0 = DEPTH - CAP_T - CAP_POST_L - 0.5;      // behind the post's far end
+    thread = DEPTH - CAP_T - CAP_FREE - y0;     // and the rest is lead-in
     for (sx = [-1, 1])
-        translate([sx * CAP_SCR_X, DEPTH - CAP_T - CAP_POST_L - 0.5, CAP_SCR_Z])
-            rotate([-90, 0, 0]) {
-                cylinder(d = CAP_PILOT, h = CAP_POST_L + 0.5);
-                translate([0, 0, CAP_POST_L + 0.5])
-                    cylinder(d = CAP_SCR_D, h = CAP_T + 1);
-            }
+        translate([sx * CAP_SCR_X, y0, CAP_SCR_Z]) rotate([-90, 0, 0]) {
+            cylinder(d = CAP_PILOT, h = thread);
+            translate([0, 0, thread])
+                cylinder(d = CAP_SCR_D, h = CAP_FREE + CAP_T + 1);
+            translate([0, 0, DEPTH - CAP_CSK - y0])
+                cylinder(d1 = CAP_SCR_D, d2 = CAP_SCR_D + 2 * CAP_CSK,
+                         h = CAP_CSK);
+            translate([0, 0, DEPTH - y0])
+                cylinder(d = CAP_SCR_D + 2 * CAP_CSK, h = 1);
+        }
 }
 
 module usb_slot() {

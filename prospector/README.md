@@ -171,6 +171,33 @@ than a snap: nothing has to flex, and nothing fatigues.
 Assembly gains one step: display screwed, **tile laid in**, back plate slid on
 over its rear tongue, two screws.
 
+### The rear screws
+
+The pilot has been wrong in both directions, which is worth recording because
+neither number was arbitrary and both were still wrong:
+
+| | | |
+|---|---|---|
+| 2.10 | screws spun straight through | sized for the M2.5 in upstream's BOM, above an M2's own major diameter |
+| 1.60 | driver cammed out; head crushed into the plate | 0.8 x major, the textbook thread-forming pilot |
+| **1.70** | | the pilot the **hat** screws use — same screw, same plastic, and the only one here that has been driven without complaint |
+
+Both now come off `M2_PILOT`, so they cannot drift apart again.
+
+The "head sinks in" half of that was the same fault seen from the other end,
+not a second one: 4.4 mm of thread to form at once takes more torque than an
+M2 head will take, and once the driver slips the head crushes 1.6 mm of plate.
+Peak torque is the pilot times how much thread is being formed at once, and the
+second term was free — `CAP_FREE` bores the post's mouth to clearance for
+1 mm first, so an M2 x 6 forms **3.4 mm** of thread rather than 4.4, and finds
+the hole square before it starts biting. The bore's lip is broken by 0.30 so
+the head beds on flat material.
+
+`CAP_HEAD` is `"pan"`. If the screws turn out to be **countersunk**, set it to
+`"flat"` and the chamfer becomes a real 90-degree seat to `CAP_HEAD_D` instead
+of an edge break — with a conical head in a straight 2.2 hole the head wedges
+and buries itself no matter what the pilot does.
+
 `SPLIT_Y` is the tip of the shell's **ledge**, not the seam — the seam sits
 `JOINT` forward of it at `SEAM_Y`. The two were the same thing while the joint
 was a butt. They must not be now: the ledge reaches further back than the seam,
