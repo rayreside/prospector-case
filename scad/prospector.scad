@@ -148,7 +148,11 @@ HOOK_W    = 6.00;     // hooks over the hat's front corners
 // Rails only need to reach back from the cap far enough to stop the hat's free
 // end lifting -- the two screws hold the front. Running them the full length
 // took them forward into the display's screw holes.
-RAIL_LEN  = 10.00;    // how far forward from the hat's back edge
+// Stopped clear of the rear cap's screw posts as well. Running to the hat's
+// back edge put the rails alongside those posts for 6 mm with 1.25 between
+// them -- not touching, but close enough to read as a collision.
+RAIL_LEN  = 8.00;     // length of each rail
+RAIL_BACK = 8.00;     // how far short of the hat's back edge they stop
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
 TIE_POSTS = false;    // a pair of posts to zip-tie the bundle down to
@@ -517,7 +521,7 @@ module mcu_hooks() {
             // Flush is a coplanar contact, and the last time a retention
             // feature met the tray that way it came out as its own shell.
             translate([sx > 0 ? hx - HOOK_D : -hx - 0.5,
-                       MCU_Y + MCU_DY + 2 * MCU_CLR - RAIL_LEN, zt])
+                       MCU_Y + MCU_DY + 2 * MCU_CLR - RAIL_BACK - RAIL_LEN, zt])
                 cube([HOOK_D + 0.5, RAIL_LEN, HOOK_T]);
 }
 
