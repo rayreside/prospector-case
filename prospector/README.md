@@ -16,10 +16,10 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 36.4** |
 | Enclosed | 59.86 cm3 | **43.92 cm3** |
-| Plastic | 15.92 cm3 | **12.12 cm3** |
+| Plastic | 15.92 cm3 | **11.85 cm3** |
 | Parts | 3 | 2 |
 
-Same width, 16% shallower, 1 mm shorter, 25% less enclosed volume, 27% less
+Same width, 16% shallower, 1 mm shorter, 27% less enclosed volume, 26% less
 filament, and the screen keeps the upstream 55 degrees. Both parts watertight,
 one shell each, zero boundary edges.
 
@@ -152,6 +152,18 @@ remembering that rails work where hooks did not: an earlier version reached
 back over the hat's front corners, so the board had to slide *into* them, and
 everything ahead of it blocked that in turn.
 
+**The kerbs themselves stop at y = 25.2, not at the hat's front edge.** The
+display's two lower access bores come down through exactly that space -- they
+leave the bosses at 55 degrees and reach the desk around y = 22 -- and the
+tray's outer corners sit on their line. Run the full length, the bores notch
+each kerb over 8 mm of a 1.5 mm wall, which is what it looks like on the part.
+`KERB_Y` is derived from the bore rather than typed in, and it is deliberately
+about 2 mm conservative: it asks the whole 5 mm bore to be clear, not just the
+0.29 mm sliver that actually overlaps, so it does not quietly go wrong if the
+kerb moves. 16.2 mm of kerb is left, against the two screws at the front and
+the cap behind. What the bores still graze is the 0.6 mm standoff pad, out
+where it overhangs the board -- and they pass through the floor there anyway.
+
 **The XIAO and its USB-C hang underneath**, propping the board 4.30 mm above the
 bottom of the stack. Missed on the first test print, where the pads had been
 drawn up to the stack's underside with no board there to meet them.
@@ -183,11 +195,11 @@ the sloping interior roof made desk-down the bad orientation:
 
 | | support | bed contact | height |
 |---|---|---|---|
-| **shell, desk-down** | **537 mm2** | **1446 mm2** | 36.4 |
-| shell, front face down | 988 mm2 | 361 mm2 | 42.6 |
-| shell, back face down | 989 mm2 | 202 mm2 | 45.4 |
+| **shell, desk-down** | **513 mm2** | **1446 mm2** | 36.4 |
+| shell, front face down | 611 mm2 | 240 mm2 | 37.2 |
+| shell, back face down | 805 mm2 | 121 mm2 | 41.4 |
 | **cap, as modelled** | **21 mm2** | 69 mm2 | 27.6 |
-| cap, laid flat | 691 mm2 | 0 mm2 | — |
+| cap, laid flat | 675 mm2 | 385 mm2 | 13.0 |
 
 All the shell's support is interior roof that nobody sees. The cap needs almost
 none standing up, but 69 mm2 of contact under a 27.6 mm part wants a brim.

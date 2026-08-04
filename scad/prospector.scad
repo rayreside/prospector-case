@@ -17,11 +17,11 @@
 // PRINTING. Shell desk-down as modelled; cap standing on its bottom edge, with
 // a brim. Measured with tools/overhang.py, not reasoned about:
 //
-//     shell   desk-down     365 mm2 support, 1462 on the bed
-//             front down    727                  0
-//             back down     884                121
+//     shell   desk-down     513 mm2 support, 1446 on the bed
+//             front down    611                240
+//             back down     805                121
 //     cap     as modelled    21 mm2 support,   69 on the bed  <- brim it
-//             laid flat     691                  0
+//             laid flat     675                385
 //
 // All the shell's support is interior roof that nobody sees.
 //
@@ -139,11 +139,11 @@ HAT_POST_D = 4.50;
 // both rails the whole way, and lands on its pads. The kerbs already stood
 // 0.9 proud of the board, which is where the idea came from.
 //
-// OFF for now. The two screws hold the hat on their own, and the rails' 1.5 mm
-// undersides run the full 27.6 as horizontal ledges, which is 107 mm2 of
-// support for retention that is already covered. The geometry stays because
-// the idea is sound if the screws ever turn out not to be enough.
-MCU_HOOKS = true;
+// OFF, and it should stay off. The two screws hold the hat on their own, and
+// the rails' 1.5 mm undersides run as horizontal ledges needing support, for
+// retention that is already covered. The geometry stays because the idea is
+// sound if the screws ever turn out not to be enough.
+MCU_HOOKS = false;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 // Rails only need to reach back from the cap far enough to stop the hat's free
 // end lifting -- the two screws hold the front. Running them the full length
@@ -248,6 +248,25 @@ SOCKET_Y = 7.10;      // south edge of the hat to the near edge of the socket
 TALL_Y = MCU_Y + MCU_CLR + SOCKET_Y;
 function hat_top_at(y) = y < TALL_Y ? PCB_Z + PCB_T : MCU_Z + MCU_DZ;
 
+// Where the tray's side kerbs are allowed to start. The display's two lower
+// access bores come down through this part of the case -- they leave the
+// bosses at 55 degrees and reach the desk around y = 22 -- and the tray's
+// outer corners are right on their line. Drawn the full length, the bores cut
+// a notch out of each kerb: it reads as a collision on the printed part and it
+// is one, a nicked 1.5 mm wall over 8 mm of its length.
+//
+// So the kerbs stop short instead. This is the y at which the bore, taken at
+// its full radius rather than at the sliver that actually overlaps, has
+// dropped clear below the tray's underside -- about 2 mm more than the tight
+// answer, and worth it for not depending on where the kerb's outer face is.
+KERB_CLR = 1.00;
+ACC_Y0 = CY - HOLE_DY / 2 * cos(TILT);              // lower boss, world y-z
+ACC_Z0 = CZ - HOLE_DY / 2 * sin(TILT);
+KERB_Y = LCD_ACCESS
+    ? max(MCU_Y, ACC_Y0 + ACCESS_D / 2 * cos(TILT) + KERB_CLR
+                 + (ACC_Z0 + ACCESS_D / 2 * sin(TILT) - (FLOOR - 0.2)) * tan(TILT))
+    : MCU_Y;
+
 
 // Distance of a point in the y-z plane from the module's back face, measured
 // along the screen normal. Positive is in front of the module, so anything
@@ -351,6 +370,8 @@ echo(str("section ", SEC_W, " x ", SEC_H, ", depth ", DEPTH,
 echo(str("hat clears the ceiling by ", MCU_FIT, " mm  (want ", SLACK, ")"));
 echo(str("plug room at the socket ", CONN_FIT, " mm  (want ", CONN_NEED, ")"));
 echo(str("headroom over the hat ", WIRE_FIT, " mm  (want ", WIRE_UP, ")"));
+echo(str("tray kerbs from y ", KERB_Y, " to ", MCU_Y + MCU_DY + 2 * MCU_CLR,
+         "  (hat front ", MCU_Y, ")"));
 
 /* ---------- primitives ---------- */
 
@@ -495,10 +516,18 @@ module hollow() {
 // the board it was meant to guide, so the hat could neither slide forward under
 // the hooks nor drop in past them -- the hooks were real geometry that nothing
 // could ever reach. The hook towers are the front stop now.
+// Two pieces, because they stop in different places. The pad under the board
+// runs the whole length -- it is only MCU_LIFT proud of the floor and nothing
+// comes near it -- while the kerbs start at KERB_Y, clear of the display's
+// access bores.
 module mcu_tray() {
+    W = MCU_DX + 2 * MCU_CLR + 2 * KERB;
+    L = MCU_DY + 2 * MCU_CLR;
     translate([0, MCU_Y, FLOOR - 0.2])
-        cube([MCU_DX + 2 * MCU_CLR + 2 * KERB, MCU_DY + 2 * MCU_CLR,
-              PCB_Z - FLOOR + KERB_H + 0.2], center = false);
+        cube([W, L, MCU_Z - FLOOR + 0.2], center = false);
+    translate([0, KERB_Y, FLOOR - 0.2])
+        cube([W, MCU_Y + L - KERB_Y, PCB_Z - FLOOR + KERB_H + 0.2],
+             center = false);
 }
 
 // Two hooks over the hat's front corners, so it is held down as well as
