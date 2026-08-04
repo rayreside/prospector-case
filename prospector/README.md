@@ -16,7 +16,7 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 36.4** |
 | Enclosed | 59.86 cm3 | **43.92 cm3** |
-| Plastic | 15.92 cm3 | **11.95 cm3** |
+| Plastic | 15.92 cm3 | **11.96 cm3** |
 | Parts | 3 | 3 |
 
 Same width, 16% shallower, 1 mm shorter, 27% less enclosed volume, 25% less
@@ -53,6 +53,7 @@ ECHO: "plug room at the socket 8.78817 mm  (want 5.43)"
 ECHO: "headroom over the hat 21.3755 mm  (want 20)"
 ECHO: "tray kerbs from y 25.2476 to 41.4  (hat front 13.8)"
 ECHO: "driver at the top screws 5.60833 mm across  (want 5)"
+ECHO: "rib roots over 1.11483 mm of plate, clearing the hat by 0.6 mm"
 ```
 
 The 20 is measured off the real bundle, from the hat's board. The plug-room ray
@@ -161,6 +162,19 @@ Split at the bend, with **no third screw**:
 | front | the shell keeps the inner half of the chamfer for 2 mm past the seam; the tile's front tongue is the outer half, lying on that ledge |
 | rear | the back plate keeps the outer half as a lip and carries a rib under it, so the tile's rear tongue runs into a groove |
 
+**The fork is the fussiest thing in the case, and it is worth knowing its
+sizes.** `CAP_T` is 1.6 and the joint splits it: lip 0.80, groove 0.80, tile's
+tongue 0.65, rib 0.80 hanging below. Nothing is under 0.65 and the two members
+that get handled are the 0.80 ones, but there is no margin left in a 1.6 plate.
+
+The rib nearly did not work at all. Stopped level with the groove's end it had
+nothing to root in — at that y the plate body is only the outer `CAP_T`, so its
+whole attachment was the **0.15 mm** of plate left below the groove. Every mesh
+check passed, because 0.15 mm of neck is still one shell with no non-manifold
+edges. A side elevation showed it at a glance. It now runs past the groove and
+roots over 1.11 mm of a 2.4 mm section, and how far it can run is set by the hat
+underneath, so `RIB_Y` is derived from that rather than typed.
+
 A tongue captured above and below cannot rotate, and with the rear unable to
 rotate the front cannot lift — which is what lets the front be a plain ledge.
 To get the tile out you would have to slide it 1.7 mm forward to clear the
@@ -263,10 +277,10 @@ roof made desk-down the bad orientation:
 |---|---|---|---|
 | **shell, desk-down** | **434 mm2** | **1446 mm2** | 36.4 |
 | shell, front face down | 611 mm2 | 240 mm2 | 37.2 |
-| shell, back face down | 738 mm2 | 121 mm2 | 41.4 |
+| shell, back face down | 737 mm2 | 117 mm2 | 41.4 |
 | **roof, outer face up** (rot 46.5) | **0 mm2** | 467 mm2 | 1.60 |
 | roof, outer face down | 9 mm2 | 548 mm2 | 1.60 |
-| **back, laid flat** (rot -90) | 397 mm2 | **385 mm2** | 5.0 |
+| **back, laid flat** (rot -90) | 362 mm2 | **380 mm2** | 5.0 |
 | back, standing | 21 mm2 | **0 mm2** | 19.2 |
 
 All the shell's support is interior roof that nobody sees.
@@ -280,7 +294,7 @@ keeps it planar.
 
 The back plate has **no flat foot** — its bottom edge is inside the case's
 bottom-back fillet, so standing it up is a line contact and the tool reports
-0 mm2 on the bed. Laid flat it is a plain panel: 385 mm2 down, and the 397 mm2
+0 mm2 on the bed. Laid flat it is a plain panel: 380 mm2 down, and the 362 mm2
 of "support" is the fork at the top standing at 43.5 degrees, a degree and a
 half the wrong side of the threshold and fine in practice. The cost is that the
 build plate's texture lands on the back face. That is the face meant to carry

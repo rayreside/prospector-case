@@ -691,9 +691,13 @@ SPLIT_Y = 30.00;
 // unchanged apart from the tile going in before the back.
 ROOF_Y    = 40.00;    // where the tile ends and the back plate begins
 JOINT     = 2.00;     // overlap at each end
-JOINT_T   = 0.70;     // outer skin at a lap, of CAP_T
+// Half of CAP_T, so the front lap is 0.80 on 0.80 and the rear lip is the same
+// 0.80 with the tile's tongue 0.15 thinner. Nothing in the joint is now under
+// 0.65, and the two members that get handled -- the lip and the shell's ledge
+// -- are the thick ones.
+JOINT_T   = 0.80;     // outer skin at a lap, of CAP_T
 JOINT_CLR = 0.15;     // clearance, in y only -- the laps are meant to touch
-RIB_T     = 1.00;     // the groove's lower jaw, standing into the cavity
+RIB_T     = 0.80;     // the groove's lower jaw, standing into the cavity
 SEAM_Y    = SPLIT_Y - JOINT;
 
 CH_K       = sqrt(1 + CH_M * CH_M);   // perpendicular thickness -> vertical
@@ -714,6 +718,24 @@ CLR_DROP   = JOINT_CLR * CH_K;
 // Everything below this must be defined already -- a forward reference here
 // resolves to undef and the number comes out silently wrong rather than
 // missing, which is how this file has been fooled before.
+// How far back the rib runs, and it must run PAST the groove. Stopped level
+// with the groove's end it had nothing to be rooted in: at that y the plate
+// body is only the outer CAP_T, so the rib's whole attachment was the 0.15 mm
+// of plate left below the groove. The mesh passed -- one shell, no non-manifold
+// edges -- because 0.15 mm of neck is still connected. It would not have
+// printed, and a side elevation showed it at a glance.
+//
+// Rooted instead over RIB_Y - ROOF_Y of solid plate. What limits that is the
+// hat underneath, so the number is derived from it rather than typed: the
+// deepest the rib can hang and still clear the hat by RIB_GAP.
+RIB_GAP = 0.60;
+RIB_Y = min(DEPTH - CAP_T,
+            DEPTH + (MCU_Z + MCU_DZ + RIB_GAP - CH_Z + CAP_DROP
+                     + RIB_T * CH_K) / CH_M);
+echo(str("rib roots over ", RIB_Y - ROOF_Y, " mm of plate, clearing the hat by ",
+         CH_Z + CH_M * (RIB_Y - DEPTH) - CAP_DROP - RIB_T * CH_K
+         - (MCU_Z + MCU_DZ), " mm"));
+
 SCR_Y = CY + HOLE_DY / 2 * cos(TILT);        // upper display screw, world y-z
 SCR_Z = CZ + HOLE_DY / 2 * sin(TILT);
 DRIVER_FIT = 2 * ((SPLIT_Y - SCR_Y) * cos(TILT)
@@ -759,37 +781,33 @@ module roof_ledge() {
     intersection() { yband(SEAM_Y, SPLIT_Y); under_ch(JOINT_DROP); }
 }
 
-// The space the tile's rear tongue runs into. Cut out of the back plate, it
-// leaves the lip above and the rib below.
-module roof_groove() {
-    difference() {
-        intersection() {
-            outer();
-            yband(ROOF_Y - JOINT - 1, ROOF_Y);   // open at the front, not flush
-            under_ch(JOINT_DROP);
-        }
-        under_ch(CAP_DROP - CLR_DROP);
-    }
-}
-
 // What the shell has to give up: the cap region less the ledge it keeps.
 module cap_void() { difference() { cap_solid(); roof_ledge(); } }
 
+// The plate, plus the two jaws of the groove the tile's rear tongue sits in.
+//
+// The groove is cut from the lap section ALONE, before the rib is unioned on,
+// rather than out of the assembled fork. Cut afterwards it had to stop short
+// of the rib, and what it stopped short by was left behind as a web -- which
+// is how the rib ended up hanging on 0.15 mm. This way the lip is simply what
+// is left of the plate above JOINT_DROP, and the rib's top face is the groove's
+// floor because they are the same plane by construction.
 module back_plate() {
     difference() {
         union() {
             intersection() { cap_solid(); yband(ROOF_Y, DEPTH + 1); }
-            // The fork, cut as one block rather than assembled from a lip and
-            // a rib. Built as two pieces the rib hung off the plate's inner
-            // face with the tile's clearance between them -- 1.27 cm3 in two
-            // shells, and nothing in a render says which two.
-            intersection() { chamfer_plate(); yband(ROOF_Y - JOINT, ROOF_Y); }
-            intersection() {
+            difference() {                          // the lip, the upper jaw
+                intersection() {
+                    chamfer_plate(); yband(ROOF_Y - JOINT, ROOF_Y);
+                }
+                under_ch(JOINT_DROP);
+            }
+            intersection() {                        // the rib, the lower jaw
                 difference() {
                     under_ch(CAP_DROP);
                     under_ch(CAP_DROP + RIB_T * CH_K);
                 }
-                yband(ROOF_Y - JOINT, ROOF_Y);
+                yband(ROOF_Y - JOINT, RIB_Y);
                 // Inside the cavity by a clearance, not flush with it. The rib
                 // has to travel in along the cavity's own walls, and a rib cut
                 // to exactly the cavity's section rubs the whole way.
@@ -798,7 +816,6 @@ module back_plate() {
                      RIM_R - WALL - JOINT_CLR, W_BACK, -WALL, -DROP / 2);
             }
         }
-        roof_groove();
         usb_slot();
         cap_screws();
     }
