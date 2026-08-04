@@ -592,8 +592,17 @@ module usb_slot() {
 // access holes through a face that is on show.
 //
 // It is also the larger surface, which is the other thing it is wanted for.
+// SPLIT_Y stops the cap's roof running forward to the display. Left to the
+// chamfer alone it reached y = 19.76, and the display face's top edge is at
+// 19.96 -- so with the cap off the case was open right up to the back of the
+// screen, which is the slot that keeps showing up in the slicer.
+SPLIT_Y = 30.00;
+
 module cap_solid() {
-    difference() { outer(); trim(DEPTH - CAP_T, 0, BACK_R, CAP_DROP); }
+    intersection() {
+        difference() { outer(); trim(DEPTH - CAP_T, 0, BACK_R, CAP_DROP); }
+        translate([-100, SPLIT_Y, -100]) cube(200);
+    }
 }
 
 module cap() {
