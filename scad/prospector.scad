@@ -14,17 +14,14 @@
 // back wall forward lowers the case at the same time as it shortens it,
 // because the top face slopes back and up.
 //
-// PRINTING. Shell desk-down as modelled; roof lying on its inner face with the
-// face that shows on top; back plate laid flat. Measured with
-// tools/overhang.py, not reasoned about:
+// PRINTING. Shell desk-down as modelled; cap standing on its bottom edge, with
+// a brim. Measured with tools/overhang.py, not reasoned about:
 //
-//     shell   desk-down     434 mm2 support, 1446 on the bed
-//             front down    611                240
-//             back down     738                121
-//     roof    outer face up   0 mm2 support,  467 on the bed  <- rot 46.5
-//             outer face down 9                548
-//     back    laid flat     397                385            <- rot -90
-//             standing       21                  0  nothing to stand on
+//     shell   desk-down     515 mm2 support, 1446 on the bed
+//             front down    610                240
+//             back down     805                117
+//     cap     as modelled    21 mm2 support,   69 on the bed  <- brim it
+//             laid flat     671                381
 //
 // All the shell's support is interior roof that nobody sees.
 //
@@ -38,7 +35,7 @@
 // separate modelling faults, and prospector/README.md records them.
 
 /* [What to build] */
-part  = "all";        // all | shell | back | roof
+part  = "all";        // all | shell | cap
 cut   = "";           // "" | x | y | z   -- section it, see CONTEXT.md
 cut_at = 0;
 cut_flip = false;
@@ -658,84 +655,18 @@ module usb_slot() {
 // chamfer alone it reached y = 19.76, and the display face's top edge is at
 // 19.96 -- so with the cap off the case was open right up to the back of the
 // screen, which is the slot that keeps showing up in the slicer.
-//
-// SPLIT_Y is now the tip of the shell's LEDGE rather than the seam. The two
-// were the same thing while the joint was a butt; with the tile landing on a
-// rebate the shell reaches JOINT further back than the seam does, and it is
-// the tip that has to stay clear of the driver -- so the tip keeps this number
-// and the seam moves forward to SEAM_Y. Every clearance is then exactly what
-// it was before the joint existed.
 SPLIT_Y = 30.00;
 
-// One bent panel was the right answer while the roof had to come off with the
-// back, and the wrong one to print. The two halves want opposite orientations:
-// the back plate stands on its bottom edge, which leaves its outer face
-// vertical and unsupported, while the roof is a flat plate that wants to lie
-// down. Bent together, whichever you favour puts the other face on the bed --
-// and the face that ends up there is the roof, which is the one on show.
+// The reason the roof leaves with the cap, as a number rather than an
+// assertion. The upper display screws run along the screen normal, and with the
+// cap off the nearest thing to that line is the corner where the shell's roof
+// stops. Twice the perpendicular distance is the fattest shaft that can reach
+// them, and it wants to beat ACCESS_D -- the bottom screws needed 5.00 before a
+// bit would pass, and there is no reason the top ones need less.
 //
-// Split, each gets what it wants and neither needs support. The cost is a
-// joint, and the joint has to hold the roof without a third screw:
-//
-//   front  the shell keeps the INNER half of the chamfer for JOINT past the
-//          seam, and the tile's front tongue is the OUTER half lying on it.
-//          A ledge, so it carries the tile; it cannot hold it down.
-//   rear   the back plate keeps the outer half as a lip and carries a rib
-//          under it, so the tile's rear tongue runs into a groove. A tongue
-//          captured top and bottom cannot rotate, and with the rear unable to
-//          rotate the front cannot lift either. That is what makes the ledge
-//          enough at the other end.
-//
-// So the tile is laid in, the back plate slides on over its rear tongue, and
-// the two screws that were already there hold everything. Assembly order is
-// unchanged apart from the tile going in before the back.
-ROOF_Y    = 40.00;    // where the tile ends and the back plate begins
-JOINT     = 2.00;     // overlap at each end
-// Half of CAP_T, so the front lap is 0.80 on 0.80 and the rear lip is the same
-// 0.80 with the tile's tongue 0.15 thinner. Nothing in the joint is now under
-// 0.65, and the two members that get handled -- the lip and the shell's ledge
-// -- are the thick ones.
-JOINT_T   = 0.80;     // outer skin at a lap, of CAP_T
-JOINT_CLR = 0.15;     // clearance, in y only -- the laps are meant to touch
-RIB_T     = 0.80;     // the groove's lower jaw, standing into the cavity
-SEAM_Y    = SPLIT_Y - JOINT;
-
-CH_K       = sqrt(1 + CH_M * CH_M);   // perpendicular thickness -> vertical
-JOINT_DROP = JOINT_T * CH_K;
-CLR_DROP   = JOINT_CLR * CH_K;
-
-// The reason the roof comes off at all, as a number. The upper display screws
-// run along the screen normal, and with the roof lifted the nearest thing to
-// that line is the tip of the shell's ledge. Twice the perpendicular distance
-// is the fattest shaft that can reach them.
-//
-// It has to be echoed because it is the one clearance that moves when the
-// joint moves, and it moves in a direction nothing on screen shows: the ledge
-// reaches JOINT further back than the seam does, and the chamfer falls as it
-// goes back, so a joint drawn from the seam quietly costs 0.6 mm of it. That
-// is why SPLIT_Y is the ledge's tip rather than the seam.
-//
-// Everything below this must be defined already -- a forward reference here
-// resolves to undef and the number comes out silently wrong rather than
-// missing, which is how this file has been fooled before.
-// How far back the rib runs, and it must run PAST the groove. Stopped level
-// with the groove's end it had nothing to be rooted in: at that y the plate
-// body is only the outer CAP_T, so the rib's whole attachment was the 0.15 mm
-// of plate left below the groove. The mesh passed -- one shell, no non-manifold
-// edges -- because 0.15 mm of neck is still connected. It would not have
-// printed, and a side elevation showed it at a glance.
-//
-// Rooted instead over RIB_Y - ROOF_Y of solid plate. What limits that is the
-// hat underneath, so the number is derived from it rather than typed: the
-// deepest the rib can hang and still clear the hat by RIB_GAP.
-RIB_GAP = 0.60;
-RIB_Y = min(DEPTH - CAP_T,
-            DEPTH + (MCU_Z + MCU_DZ + RIB_GAP - CH_Z + CAP_DROP
-                     + RIB_T * CH_K) / CH_M);
-echo(str("rib roots over ", RIB_Y - ROOF_Y, " mm of plate, clearing the hat by ",
-         CH_Z + CH_M * (RIB_Y - DEPTH) - CAP_DROP - RIB_T * CH_K
-         - (MCU_Z + MCU_DZ), " mm"));
-
+// Everything it reads must be defined already. A forward reference here comes
+// back undef and the number is silently wrong rather than missing, which is a
+// mistake this file has made before.
 SCR_Y = CY + HOLE_DY / 2 * cos(TILT);        // upper display screw, world y-z
 SCR_Z = CZ + HOLE_DY / 2 * sin(TILT);
 DRIVER_FIT = 2 * ((SPLIT_Y - SCR_Y) * cos(TILT)
@@ -743,111 +674,18 @@ DRIVER_FIT = 2 * ((SPLIT_Y - SCR_Y) * cos(TILT)
 echo(str("driver at the top screws ", DRIVER_FIT, " mm across  (want ",
          ACCESS_D, ")"));
 
-// Everything below the chamfer plane, offset perpendicularly by `drop`. The
-// laps are all "which side of a plane parallel to the roof", so they are all
-// this module with a different offset.
-module under_ch(drop) {
-    translate([0, DEPTH, CH_Z - drop]) rotate([atan(CH_M), 0, 0])
-        translate([-150, -150, -300]) cube([300, 300, 300]);
-}
-
-module yband(y0, y1) { translate([-100, y0, -100]) cube([200, y1 - y0, 200]); }
-
 module cap_solid() {
     intersection() {
         difference() { outer(); trim(DEPTH - CAP_T, 0, BACK_R, CAP_DROP); }
-        translate([-100, SEAM_Y, -100]) cube(200);
+        translate([-100, SPLIT_Y, -100]) cube(200);
     }
 }
 
-// The chamfer plate on its own, which is NOT cap_solid clipped in y. cap_solid
-// is bounded by trim(), so it carries the BACK_R rounding at the bottom-back
-// corner as a curved sliver down at the desk -- harmless while the cap was one
-// part and attached to it, and a second loose shell in the tile the moment the
-// band no longer reaches the back wall. Bounded by the two chamfer planes
-// instead, it is only ever the plate.
-module chamfer_plate() { difference() { outer(); under_ch(CAP_DROP); } }
-
-// The inner half of the chamfer over the lap band. This stays with the SHELL,
-// and the tile's front tongue lands on it.
-//
-// A half-space and a slab, not a plate -- it is only ever subtracted from
-// cap_solid, so it needs no lower or lateral bound of its own. Given one, it
-// was chamfer_plate() clipped to the band, whose inner face is the same plane
-// as cap_solid's; the difference of two solids meeting on a shared face left
-// slivers, and the shell came back with 16 non-manifold edges where it had had
-// none. Bounded loosely, the only new face is the one that is meant to be new.
-module roof_ledge() {
-    intersection() { yband(SEAM_Y, SPLIT_Y); under_ch(JOINT_DROP); }
-}
-
-// What the shell has to give up: the cap region less the ledge it keeps.
-module cap_void() { difference() { cap_solid(); roof_ledge(); } }
-
-// The plate, plus the two jaws of the groove the tile's rear tongue sits in.
-//
-// The groove is cut from the lap section ALONE, before the rib is unioned on,
-// rather than out of the assembled fork. Cut afterwards it had to stop short
-// of the rib, and what it stopped short by was left behind as a web -- which
-// is how the rib ended up hanging on 0.15 mm. This way the lip is simply what
-// is left of the plate above JOINT_DROP, and the rib's top face is the groove's
-// floor because they are the same plane by construction.
-module back_plate() {
+module cap() {
     difference() {
-        union() {
-            intersection() { cap_solid(); yband(ROOF_Y, DEPTH + 1); }
-            difference() {                          // the lip, the upper jaw
-                intersection() {
-                    chamfer_plate(); yband(ROOF_Y - JOINT, ROOF_Y);
-                }
-                under_ch(JOINT_DROP);
-            }
-            intersection() {                        // the rib, the lower jaw
-                difference() {
-                    under_ch(CAP_DROP);
-                    under_ch(CAP_DROP + RIB_T * CH_K);
-                }
-                yband(ROOF_Y - JOINT, RIB_Y);
-                // Inside the cavity by a clearance, not flush with it. The rib
-                // has to travel in along the cavity's own walls, and a rib cut
-                // to exactly the cavity's section rubs the whole way.
-                band(SEC_W - 2 * WALL - 2 * JOINT_CLR,
-                     SEC_H + DROP - 2 * WALL - 2 * JOINT_CLR,
-                     RIM_R - WALL - JOINT_CLR, W_BACK, -WALL, -DROP / 2);
-            }
-        }
+        cap_solid();
         usb_slot();
         cap_screws();
-    }
-}
-
-// A flat plate of constant thickness -- both faces are the chamfer plane and
-// its offset, and ROOF_Y is forward of where BACK_R starts rounding either of
-// them (42.11 outside, 40.51 in). That is what lets it lie on the bed with the
-// face that shows pointing up.
-module roof() {
-    difference() {
-        intersection() {
-            chamfer_plate();
-            yband(SEAM_Y + JOINT_CLR, ROOF_Y - JOINT_CLR);
-        }
-        // front: keep the outer half, to lie on the shell's ledge
-        intersection() { yband(-100, SPLIT_Y + JOINT_CLR); under_ch(JOINT_DROP); }
-        // rear: keep the inner half, to run into the back plate's groove.
-        // Clearance goes on the underside, against the rib -- the lip above is
-        // the face that holds the tile down and is meant to touch it.
-        // The rebate has to start BEFORE the lip's tip, not after it. Started
-        // JOINT_CLR the other way the tile kept its outer skin for 0.15 under
-        // the lip's leading edge, and the two parts overlapped by 7.7 mm3 --
-        // invisible in a render, and the only thing that showed it was
-        // intersecting the two solids and finding the result was not empty.
-        intersection() {
-            yband(ROOF_Y - JOINT - JOINT_CLR, 100);
-            union() {
-                difference() { outer(); under_ch(JOINT_DROP); }
-                under_ch(CAP_DROP - CLR_DROP);
-            }
-        }
     }
 }
 
@@ -947,7 +785,7 @@ module shell() {
         lcd_access();
         seat_bottom();
         cap_screws();
-        cap_void();
+        cap_solid();
     }
     }
     hat_screws();
@@ -969,9 +807,8 @@ module ghost_mcu() {
 
 module assembly() {
     if (part == "all" || part == "shell") color("Gainsboro") shell();
-    if (part == "all" || part == "back")  color("DarkSalmon") back_plate();
-    if (part == "all" || part == "roof")  color("Khaki") roof();
-    if (show_parts && part == "all") { ghost_display(); ghost_mcu(); }
+    if (part == "all" || part == "cap") color("DarkSalmon") cap();
+    if (show_parts && part != "cap") { ghost_display(); ghost_mcu(); }
 }
 
 module keep() {

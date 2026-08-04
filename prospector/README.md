@@ -16,18 +16,12 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 36.4** |
 | Enclosed | 59.86 cm3 | **43.92 cm3** |
-| Plastic | 15.92 cm3 | **11.96 cm3** |
-| Parts | 3 | 3 |
+| Plastic | 15.92 cm3 | **11.84 cm3** |
+| Parts | 3 | 2 |
 
-Same width, 16% shallower, 1 mm shorter, 27% less enclosed volume, 25% less
-filament, and the screen keeps the upstream 55 degrees. All three parts
-watertight, one shell each, zero boundary and non-manifold edges.
-
-Three parts again, after a spell at two. The back was one bent panel, and the
-two halves of that bend want opposite print orientations — so whichever you
-favour, the other face lands on the build plate, and the face that lost was the
-roof, the one on show. Split at the bend, each half prints the way it wants and
-the joint costs no extra fastener.
+Same width, 16% shallower, 1 mm shorter, 27% less enclosed volume, 26% less
+filament, and the screen keeps the upstream 55 degrees. Both parts watertight,
+one shell each, zero boundary edges.
 
 The width is the module's pocket plus a 1.7 bezel and cannot go below that.
 Everything else saved is depth, and it comes from folding the boards together
@@ -53,7 +47,6 @@ ECHO: "plug room at the socket 8.78817 mm  (want 5.43)"
 ECHO: "headroom over the hat 21.3755 mm  (want 20)"
 ECHO: "tray kerbs from y 25.2476 to 41.4  (hat front 13.8)"
 ECHO: "driver at the top screws 5.60833 mm across  (want 5)"
-ECHO: "rib roots over 1.11483 mm of plate, clearing the hat by 0.6 mm"
 ```
 
 The 20 is measured off the real bundle, from the hat's board. The plug-room ray
@@ -124,8 +117,7 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 | part | held by |
 |---|---|
 | display | drops in from the front, lip lands on the flat face, 4 x M2 from inside into its own standoffs |
-| back plate | 2 x M2 into posts at x = +/-16 |
-| roof tile | lands on the shell's ledge at the front; its rear tongue is trapped in the back plate's groove. No fastener of its own |
+| rear cap | 2 x M2 into posts at x = +/-16; carries the chamfered roof too |
 | hat | two M2 into pads at its own hole positions |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
 
@@ -143,47 +135,26 @@ ring ever carried was the four screws. Before that it was 2.50, and all four
 holes fell inside the connector window with no material under them — a case the
 display could not be screwed to, invisible in every render.
 
-**The roof has to lift off, and it is not fixed to the back.** The display's
-upper screws run along the screen normal, and with the roof fixed to the shell
-the driver's line is blocked by the roof's rear edge. With it off, the fattest
-shaft that reaches those screws is **5.61 mm** — echoed on every build, because
-it is the one clearance that moves when the joint moves. The alternative was
-access holes through a face that is on show.
+The cap is a **bent panel**: the vertical back and the chamfered roof in one
+piece. It has to be. The display's upper screws run along the screen normal,
+and with the roof fixed to the shell the driver's line is blocked by the roof's
+rear edge; taking the roof off with the cap clears it, and the fattest shaft
+that then reaches them is **5.61 mm**, echoed on every build. The alternative
+was access holes through a visible face. It is also much the larger surface, if
+it is going to carry anything printed on it.
 
-For a while the roof lifted off *with* the back, as one bent panel. That reads
-well and prints badly: the vertical back wants to stand on its bottom edge, the
-roof wants to lie flat, and bent together one of them always loses. The one
-that lost was the roof, face-down on the build plate.
-
-Split at the bend, with **no third screw**:
-
-| | |
-|---|---|
-| front | the shell keeps the inner half of the chamfer for 2 mm past the seam; the tile's front tongue is the outer half, lying on that ledge |
-| rear | the back plate keeps the outer half as a lip and carries a rib under it, so the tile's rear tongue runs into a groove |
-
-**The fork is the fussiest thing in the case, and it is worth knowing its
-sizes.** `CAP_T` is 1.6 and the joint splits it: lip 0.80, groove 0.80, tile's
-tongue 0.65, rib 0.80 hanging below. Nothing is under 0.65 and the two members
-that get handled are the 0.80 ones, but there is no margin left in a 1.6 plate.
-
-The rib nearly did not work at all. Stopped level with the groove's end it had
-nothing to root in — at that y the plate body is only the outer `CAP_T`, so its
-whole attachment was the **0.15 mm** of plate left below the groove. Every mesh
-check passed, because 0.15 mm of neck is still one shell with no non-manifold
-edges. A side elevation showed it at a glance. It now runs past the groove and
-roots over 1.11 mm of a 2.4 mm section, and how far it can run is set by the hat
-underneath, so `RIB_Y` is derived from that rather than typed.
-
-A tongue captured above and below cannot rotate, and with the rear unable to
-rotate the front cannot lift — which is what lets the front be a plain ledge.
-To get the tile out you would have to slide it 1.7 mm forward to clear the
-groove, and the shell's shoulder stops it at 0.15. So it is captive, and the
-only way to release it is to take the back plate off. That is a better answer
-than a snap: nothing has to flex, and nothing fatigues.
-
-Assembly gains one step: display screwed, **tile laid in**, back plate slid on
-over its rear tongue, two screws.
+> The cap was split into a roof tile and a back plate for three commits, so
+> each half could print the way it wants — the tile flat with its show face up,
+> the back plate on its bottom edge — held by a ledge at the front and a groove
+> at the rear, with no third screw. The mechanism was sound and it is in the
+> history at `bee6b9a`. What sank it is that a 1.6 mm plate has to be split
+> three ways to make that joint: lip 0.80, groove 0.80, tongue 0.65, with a rib
+> hanging below. No margin anywhere, and the rib was rooted in **0.15 mm** of
+> neck until a side elevation caught it — every mesh check passed, because
+> 0.15 mm of neck is still one shell.
+>
+> The bent panel's only cost is that the roof's outer face prints against the
+> build plate. The split's cost was every feature in it having none to give.
 
 ### The rear screws
 
@@ -211,13 +182,6 @@ the head beds on flat material.
 `"flat"` and the chamfer becomes a real 90-degree seat to `CAP_HEAD_D` instead
 of an edge break — with a conical head in a straight 2.2 hole the head wedges
 and buries itself no matter what the pilot does.
-
-`SPLIT_Y` is the tip of the shell's **ledge**, not the seam — the seam sits
-`JOINT` forward of it at `SEAM_Y`. The two were the same thing while the joint
-was a butt. They must not be now: the ledge reaches further back than the seam,
-the chamfer falls as it goes back, and a joint measured from the seam quietly
-takes 0.6 mm off the driver clearance. Anchored on the tip, every clearance is
-exactly what it was before the joint existed.
 
 The hat drops onto pads at its own hole positions and takes two M2. With the
 seat cut back to a rim a driver comes straight down through the display
@@ -268,50 +232,46 @@ slide in together. One more feature, no more parts.
 
 ## Printing
 
-**Shell desk-down as modelled. Roof lying on its inner face, outer face up.
-Back plate lying flat.** Measured with `tools/overhang.py`, not reasoned about
-— for the shell it contradicts the obvious guess, that the sloping interior
-roof made desk-down the bad orientation:
+**Shell desk-down as modelled; cap standing on its bottom edge, with a brim.**
+Measured with `tools/overhang.py`, and it contradicts the obvious guess — that
+the sloping interior roof made desk-down the bad orientation:
 
 | | support | bed contact | height |
 |---|---|---|---|
-| **shell, desk-down** | **434 mm2** | **1446 mm2** | 36.4 |
-| shell, front face down | 611 mm2 | 240 mm2 | 37.2 |
-| shell, back face down | 737 mm2 | 117 mm2 | 41.4 |
-| **roof, outer face up** (rot 46.5) | **0 mm2** | 467 mm2 | 1.60 |
-| roof, outer face down | 9 mm2 | 548 mm2 | 1.60 |
-| **back, laid flat** (rot -90) | 362 mm2 | **380 mm2** | 5.0 |
-| back, standing | 21 mm2 | **0 mm2** | 19.2 |
+| **shell, desk-down** | **515 mm2** | **1446 mm2** | 36.4 |
+| shell, front face down | 610 mm2 | 240 mm2 | 37.2 |
+| shell, back face down | 805 mm2 | 117 mm2 | 41.4 |
+| **cap, as modelled** | **21 mm2** | 69 mm2 | 27.6 |
+| cap, laid flat | 671 mm2 | 381 mm2 | 13.0 |
 
-All the shell's support is interior roof that nobody sees.
-
-**The roof comes out 1.60 mm tall at rot 46.5, which is the whole point** —
-both its faces are the chamfer plane and its offset, so it is a flat plate of
-constant thickness and it lies down with the face that shows on top. No
-support, no plate texture where it matters. `ROOF_Y` is forward of where
-`BACK_R` starts rounding either face (42.11 outside, 40.51 in), which is what
-keeps it planar.
-
-The back plate has **no flat foot** — its bottom edge is inside the case's
-bottom-back fillet, so standing it up is a line contact and the tool reports
-0 mm2 on the bed. Laid flat it is a plain panel: 380 mm2 down, and the 362 mm2
-of "support" is the fork at the top standing at 43.5 degrees, a degree and a
-half the wrong side of the threshold and fine in practice. The cost is that the
-build plate's texture lands on the back face. That is the face meant to carry
-graphics, so it is a choice rather than a defect — flip to a smooth sheet if it
-should be glossy.
+All the shell's support is interior roof that nobody sees. The cap needs almost
+none standing up, but 69 mm2 of contact under a 27.6 mm part wants a brim.
 
 The tool ignores shallow faces within 1 mm of the bed, which matters: without
 that the 0.80 mm counterbore ledge scored 153 mm2 against an orientation where
-it was really just the second layer.
+it was really just the second layer. **It also hides things.** On the split
+roof tile it reported a clean 0 mm2 while a 2.9 mm ledge floated 0.80 above the
+bed -- inside the exemption, and a mating face. Pass `--above 0` before trusting
+a zero, and read the heights rather than the total.
+
+Settings the geometry dictates, whatever the printer: **0.20 layer height**,
+because the joint steps are 0.80 and the cap is 1.60 and both divide exactly;
+thin-wall detection on; and support for the shell only. The cap standing up
+needs almost none, and support anywhere near the display seat has to come back
+out through the pocket.
 
 ## Still to do
 
-- **The back plate's bottom-back fillet reaches 0.12 mm from the hat.** The
-  `BACK_R` rounding where the back plate meets the desk curves forward of
-  y = 41.4 by 0.18, and the hat's rear edge is at 41.1. Positive, and it is
-  pre-existing geometry rather than anything the split introduced, but it is
-  the tightest unintended clearance in the case and nothing checks it.
+- **Shell and cap meet at exactly 0.00**, because `cap_solid()` defines both
+  surfaces. Checked rather than assumed: intersecting the two parts gives a
+  zero-volume result, so they touch on the y = 41.4 plane and nowhere overlap.
+  That is a butt joint located by two screws, which is what it should be — the
+  worry only applies to a feature that has to *enter* the other part, and there
+  is no longer one.
+- **The cap's bottom-back fillet reaches 0.12 mm from the hat.** The `BACK_R`
+  rounding where the cap meets the desk curves forward of y = 41.4 by 0.18, and
+  the hat's rear edge is at 41.1. Positive, but it is the tightest unintended
+  clearance in the case and nothing checks it.
 - **Three self-intersecting triangle pairs and twelve degenerate faces** remain
   in the shell, out of 3394. Down from 219, which is what the slicer was
   visibly choking on. Slicers deal with what is left routinely.
@@ -321,10 +281,8 @@ it was really just the second layer.
 - **The socket's position across the module is still unknown**, only that it is
   on the left. `CONN_SLOT_*` is a generous relief rather than a fitted pocket.
 - **No full assembly has been printed.** The shell has been through several
-  test prints; neither the roof nor the back plate has. The joint's clearances
-  are 0.15 throughout, checked by intersecting the parts pairwise rather than
-  by fitting them — that check finds overlap, and found 7.7 mm3 of it once, but
-  it cannot tell you whether 0.15 is enough on your printer.
+  test prints; the cap has not. The rear screws have, and drove badly enough to
+  change the pilot twice — see above.
 
 ## Layouts that were considered and dropped
 
