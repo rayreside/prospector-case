@@ -17,9 +17,9 @@
 // PRINTING. Shell desk-down as modelled; cap standing on its bottom edge, with
 // a brim. Measured with tools/overhang.py, not reasoned about:
 //
-//     shell   desk-down     515 mm2 support, 1446 on the bed
+//     shell   desk-down     424 mm2 support, 1446 on the bed
 //             front down    610                240
-//             back down     805                117
+//             back down     846                117
 //     cap     as modelled    21 mm2 support,   69 on the bed  <- brim it
 //             laid flat     671                381
 //
@@ -521,6 +521,23 @@ module hollow() {
         // self-intersecting triangle pairs with them. Let the cavity overrun
         // and let cap_solid() alone define where the shell stops.
         trim(DEPTH + 1, WALL, max(BACK_R - WALL, 0.5), -0.5);
+        // That overrun is right BEHIND the split and wrong in front of it.
+        // Forward of SPLIT_Y the shell has to carry the roof itself, and
+        // nothing was setting its thickness: its outer face is the chamfer,
+        // its inner face was whatever the cavity prism's top face happened to
+        // be, and those two planes converge and cross at y = 30.2. So the roof
+        // ran out as a wedge -- 0.59 mm thick at y = 29, 0.27 at y = 29.9,
+        // nothing at the seam -- and the feather edge tore off the printed
+        // part and left a slot along the top of the cap.
+        //
+        // Bounded by the cap's own inner face instead, so the shell's roof is
+        // the same 1.6 plate the cap is and the two butt flush. Behind the
+        // split this bound does nothing, which is what keeps the overrun above
+        // free to be the only thing describing that surface.
+        union() {
+            trim(DEPTH + 1, WALL, max(BACK_R - WALL, 0.5), CAP_DROP);
+            translate([-100, SPLIT_Y, -100]) cube(200);
+        }
     }
 }
 

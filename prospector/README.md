@@ -16,7 +16,7 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 36.4** |
 | Enclosed | 59.86 cm3 | **43.92 cm3** |
-| Plastic | 15.92 cm3 | **11.84 cm3** |
+| Plastic | 15.92 cm3 | **11.98 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 1 mm shorter, 27% less enclosed volume, 26% less
@@ -128,6 +128,18 @@ out to 41.33 x 33.33 for the last **0.80 mm** before the rim. So the case never
 sits over the glass, and how close the picture runs to the module's edge stops
 mattering.
 
+**The shell's own roof needed its thickness stated.** Between the display and
+the cap the outer face is the chamfer, and for a long time the inner face was
+just wherever the cavity prism's top face happened to fall. Those two planes
+converge and cross at y = 30.2, so the roof ran out as a wedge — 0.59 mm thick
+at y = 29, 0.27 at 29.9, nothing at the seam. On the printed part the feather
+edge tore off and left an open slot along the top of the cap, which is what it
+looked like: a gap where the cap meets the case. The cavity is now bounded by
+the cap's own inner face forward of `SPLIT_Y`, so the shell's roof is the same
+1.6 plate the cap is and the two butt flush. Behind the split that bound does
+nothing, which leaves the deliberate overrun as the only thing describing that
+surface — the arrangement that got the self-intersections down from 219.
+
 The seat is a 1.6 rim with an 8 mm pad at each screw, and nothing in between.
 It was a 7.25 ledge until it became clear it was holding nothing: the module
 front-loads and its lip lands on the face, so nothing can fall inward. All the
@@ -238,9 +250,9 @@ the sloping interior roof made desk-down the bad orientation:
 
 | | support | bed contact | height |
 |---|---|---|---|
-| **shell, desk-down** | **515 mm2** | **1446 mm2** | 36.4 |
+| **shell, desk-down** | **424 mm2** | **1446 mm2** | 36.4 |
 | shell, front face down | 610 mm2 | 240 mm2 | 37.2 |
-| shell, back face down | 805 mm2 | 117 mm2 | 41.4 |
+| shell, back face down | 846 mm2 | 117 mm2 | 41.4 |
 | **cap, as modelled** | **21 mm2** | 69 mm2 | 27.6 |
 | cap, laid flat | 671 mm2 | 381 mm2 | 13.0 |
 
