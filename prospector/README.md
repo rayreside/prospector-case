@@ -14,9 +14,9 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 
 | | upstream, no sensor | this |
 |---|---|---|
-| Envelope | 43.2 x 51.4 x 38.0 | **42.8** x **43.0 x 36.1** |
-| Enclosed | 59.86 cm3 | **43.79 cm3** |
-| Plastic | 15.92 cm3 | **12.38 cm3** |
+| Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 36.4** |
+| Enclosed | 59.86 cm3 | **43.92 cm3** |
+| Plastic | 15.92 cm3 | **12.12 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 1 mm shorter, 25% less enclosed volume, 27% less
@@ -42,13 +42,16 @@ three gates are computed and echoed on every build, because not one of them is
 visible in a render:
 
 ```
-ECHO: "hat clears the ceiling by 6.47606 mm  (want 3)"
-ECHO: "plug room at the socket 20.2712 mm  (want 15)"
-ECHO: "headroom over the hat 21.3678 mm  (want 20)"
+ECHO: "hat clears the ceiling by 3.69987 mm  (want 2.5)"
+ECHO: "plug room at the socket 8.78817 mm  (want 5.43)"
+ECHO: "headroom over the hat 21.3755 mm  (want 20)"
 ```
 
-The 15 and the 20 are measured off the real bundle — it takes 15 mm bunched and
-uncompressed, and wants 20 mm above the hat to turn upward comfortably.
+The 20 is measured off the real bundle, from the hat's board. The plug-room ray
+carries only the plug's own reach; it used to carry the bundle's 15 mm as well,
+which was double counting -- the bundle is checked by the headroom test, in the
+direction it actually travels. SLACK is 2.5 because it binds at the hat's bare
+front corner, where nothing but air passes.
 
 Each of these has been wrong at least once in a way that only a number caught:
 
@@ -111,8 +114,7 @@ case at **69 mm** deep. The hat owns the bottom-back corner.
 
 | part | held by |
 |---|---|
-| display | drops in from the front, lip in the counterbore, 4 x M2 from inside into its own standoffs |
-
+| display | drops in from the front, lip lands on the flat face, 4 x M2 from inside into its own standoffs |
 | rear cap | 2 x M2 into posts at x = +/-16; carries the chamfered roof too |
 | hat | two M2 into pads at its own hole positions |
 | cable | two posts to zip-tie the bundle down, clear of the seat's bosses |
@@ -124,10 +126,12 @@ out to 41.33 x 33.33 for the last **0.80 mm** before the rim. So the case never
 sits over the glass, and how close the picture runs to the module's edge stops
 mattering.
 
-The seat is 7.25 mm wide because that is what it takes to carry the module's
-own mounting bosses. At the 2.50 it started at, all four holes fell inside the
-connector window with nothing under them — a case the display could not be
-screwed to, invisible in every render.
+The seat is a 1.6 rim with an 8 mm pad at each screw, and nothing in between.
+It was a 7.25 ledge until it became clear it was holding nothing: the module
+front-loads and its lip lands on the face, so nothing can fall inward. All the
+ring ever carried was the four screws. Before that it was 2.50, and all four
+holes fell inside the connector window with no material under them — a case the
+display could not be screwed to, invisible in every render.
 
 The cap is a **bent panel**: the vertical back and the chamfered roof in one
 piece. It has to be. The display's upper screws run along the screen normal,
@@ -173,37 +177,42 @@ slide in together. One more feature, no more parts.
 
 ## Printing
 
-**Shell desk-down as modelled, cap flat.** Measured with `tools/overhang.py`,
-and it contradicts the obvious guess — that the sloping interior roof made
-desk-down the bad orientation:
+**Shell desk-down as modelled; cap standing on its bottom edge, with a brim.**
+Measured with `tools/overhang.py`, and it contradicts the obvious guess — that
+the sloping interior roof made desk-down the bad orientation:
 
-| shell orientation | support | bed contact | height |
+| | support | bed contact | height |
 |---|---|---|---|
-| **desk-down (0)** | **369 mm2** | **1462 mm2** | 36.9 |
-| front face down (110) | 988 mm2 | 361 mm2 | 42.6 |
-| back face down (-90) | 989 mm2 | 202 mm2 | 45.4 |
+| **shell, desk-down** | **537 mm2** | **1446 mm2** | 36.4 |
+| shell, front face down | 988 mm2 | 361 mm2 | 42.6 |
+| shell, back face down | 989 mm2 | 202 mm2 | 45.4 |
+| **cap, as modelled** | **21 mm2** | 69 mm2 | 27.6 |
+| cap, laid flat | 691 mm2 | 0 mm2 | — |
 
-Least support *and* four times the bed contact. All of its support is interior
-roof that nobody sees.
-
-The cap prints **as modelled**, standing on its bottom edge. Every face is
-steeper than 45 degrees that way, so it needs 21 mm2 of support against 688
-laid flat -- but it stands 37 mm tall on 69 mm2 of contact, so give it a brim.
+All the shell's support is interior roof that nobody sees. The cap needs almost
+none standing up, but 69 mm2 of contact under a 27.6 mm part wants a brim.
 
 The tool ignores shallow faces within 1 mm of the bed, which matters: without
-that the 0.80 mm counterbore ledge scores 153 mm2 against an orientation where
-it is really just the second layer.
+that the 0.80 mm counterbore ledge scored 153 mm2 against an orientation where
+it was really just the second layer.
 
 ## Still to do
 
-**Nothing has been printed yet.** Every figure here is measured off geometry,
-not off a part. That is the only open item.
-
-`PLUG_H` is the one estimated number in the model — 4 mm, inferred from the
-hat's 9.82 stack rather than measured — and it is provably not binding. The
-plug-room check has 20.27 mm against a requirement that is the greater of 15
-and `CONN_H + PLUG_H`, so it does not fail until `PLUG_H` exceeds **18.85**.
-The entire hat stack is 9.82 tall. Measuring it would change nothing.
+- **Shell and cap have zero clearance where they meet.** `cap_solid()` defines
+  both surfaces, so the fit is exactly nominal. That is correct geometry and
+  wrong for printing — two printed faces meeting at 0.00 will interfere. It has
+  not bitten yet because only the shell has been printed. Needs 0.1–0.2 mm
+  somewhere before the first assembly print.
+- **Three self-intersecting triangle pairs and twelve degenerate faces** remain
+  in the shell, out of 3394. Down from 219, which is what the slicer was
+  visibly choking on. Slicers deal with what is left routinely.
+- **`PLUG_H` is the one estimated number** — 4 mm, inferred from the hat's 9.82
+  stack rather than measured. The plug-room check has 8.79 against a need of
+  5.43, so it does not fail until `PLUG_H` exceeds 7.36.
+- **The socket's position across the module is still unknown**, only that it is
+  on the left. `CONN_SLOT_*` is a generous relief rather than a fitted pocket.
+- **No full assembly has been printed.** The shell has been through several
+  test prints; the cap has not.
 
 ## Layouts that were considered and dropped
 
