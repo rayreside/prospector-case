@@ -120,8 +120,17 @@ up — which also drops the USB-C to the bottom of the stack where it wants to b
 that is 17.9 cm3 of hardware, in a stock case enclosing 59.9 — only 30% full,
 but the free space is the wrong shape, not surplus.
 
-Reset access is **not required** — the user has never needed the button in
-several months of use. Do not spend geometry on it.
+Reset access **is** required, reversing an earlier note here that said it was
+not. The button had gone unused for months, which is why the case was built
+without it; it is wanted now.
+
+It faces **down**, at the case's floor. The XIAO hangs under the hat and the
+whole stack is inverted, so the component side the button sits on points at the
+underside -- upstream's cantilever tab in the rear cap was for a bare XIAO the
+other way up and does not transfer.
+
+*** ITS POSITION ACROSS THE BOARD IS UNMEASURED. `RESET` in prospector.scad
+stays false until it is.
 
 ### What this rules out
 

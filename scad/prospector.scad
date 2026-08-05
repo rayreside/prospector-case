@@ -87,6 +87,34 @@ CONN_SLOT_OVER = 0.60; // past the pocket wall, leaving 1.1 of rim
 LCD_ACCESS = true;
 ACCESS_D   = 5.00;    // 3.60 took a shaft but not a bit
 
+// A pin hole for the XIAO's reset button. REFERENCE.md used to say not to
+// spend geometry on this -- the button had never been needed in months of use
+// -- and that is now reversed.
+//
+// It goes through the FLOOR because of how this build sits: the XIAO hangs
+// underneath the hat and the whole stack is inverted, so the component face
+// the button is on points down at the case's underside. Upstream's answer, a
+// cantilever tab in the rear cap, was for a bare XIAO the other way up and
+// does not transfer.
+//
+// A hole rather than a plunger or a sprung tab. The floor's top is at 1.6 and
+// the button sits around z = 3 to 4, so anything captive would have to bridge
+// a couple of millimetres of air and would rattle for the rest of its life to
+// save reaching for a paperclip on an operation this user has needed once in
+// several months.
+//
+// *** POSITION UNMEASURED. RESET stays false until it is. What is clear down
+// there, if it helps in choosing: the hat's screw pads sit at x = +/-8.55 over
+// y = 14.5..19, the tray kerbs run down both sides from y = 23.8 at |x| > 11.25,
+// the display's access bores come through at |x| = 12.5..17.5 over y = 17.5..26,
+// and the rear cap's post feet are at |x| = 13..19 behind y = 35.4. Anything
+// with |x| <= 10 between y = 20 and 41 misses all of it.
+RESET      = false;
+RESET_X    = 0.00;    // *** across the case, + right as you face the screen
+RESET_Y    = 30.00;   // *** from the case's front face
+RESET_D    = 2.60;    // a paperclip, or a 2 mm hex key
+RESET_CSK  = 5.00;    // funnel at the underside, so the pin finds it blind
+
 // Below the module the seat is carrying nothing -- the lower bosses sit at
 // v = -11.285 and everything under them is there only because the ring was
 // drawn at a uniform width. Opened out between them.
@@ -159,20 +187,31 @@ HAT_POST_D = 4.50;
 // both rails the whole way, and lands on its pads. The kerbs already stood
 // 0.9 proud of the board, which is where the idea came from.
 //
-// OFF, and it should stay off. The two screws hold the hat on their own, and
-// the rails' 1.5 mm undersides run as horizontal ledges needing support, for
-// retention that is already covered. The geometry stays because the idea is
-// sound if the screws ever turn out not to be enough.
-MCU_HOOKS = false;
+// BACK ON, and the reason is worth keeping because this reverses twice.
+//
+// They were on, then off -- the two screws hold the hat perfectly well against
+// gravity and against the cable, and the rails' undersides are horizontal ledge
+// to support for retention that was already covered.
+//
+// Then the reset button. Both screws are at the hat's SOUTH end, y = 16.75, and
+// the button is at the far end; pressing it from below is a force trying to
+// lift the free end, and the board would tilt about those two screws. Nothing
+// else in the case touches the hat's north end. So the rails come back -- not
+// for retention in general, but to take that one load.
+MCU_HOOKS = true;
 HOOK_W    = 6.00;     // hooks over the hat's front corners
 // Rails only need to reach back from the cap far enough to stop the hat's free
 // end lifting -- the two screws hold the front. Running them the full length
 // took them forward into the display's screw holes.
-// Stopped clear of the rear cap's screw posts as well. Running to the hat's
-// back edge put the rails alongside those posts for 6 mm with 1.25 between
-// them -- not touching, but close enough to read as a collision.
-RAIL_LEN  = 8.00;     // length of each rail
-RAIL_BACK = 8.00;     // how far short of the hat's back edge they stop
+// They also moved NORTH once the reset gave them a job. At RAIL_BACK = 8 they
+// sat over y = 25..33, the middle of the board, with little leverage on a press
+// at the north end. At 2 they run y = 29.4..39.4 and hold the end being pushed.
+//
+// 8 had been chosen to stand clear of the rear cap's posts, which on measuring
+// is a clearance rather than a collision: the posts are at |x| = 13..19 and the
+// rails reach 11.75, so they miss by 1.25 whatever the length.
+RAIL_LEN  = 10.00;    // length of each rail
+RAIL_BACK = 2.00;     // how far short of the hat's back edge they stop
 HOOK_D    = 1.50;     // how far they reach back over it
 HOOK_T    = 1.20;     // thickness of the tongue
 TIE_POSTS = false;    // a pair of posts to zip-tie the bundle down to
@@ -668,6 +707,17 @@ module cap_screws() {
         }
 }
 
+// Bored from the underside, funnelled where it opens so a pin can find it
+// without the case being turned over and inspected.
+module reset_hole() {
+    if (RESET)
+        translate([RESET_X, RESET_Y, -1]) {
+            cylinder(d = RESET_D, h = FLOOR + 2);
+            cylinder(d1 = RESET_CSK, d2 = RESET_D,
+                     h = (RESET_CSK - RESET_D) / 2 + 1);
+        }
+}
+
 module usb_slot() {
     translate([0, DEPTH - CAP_T / 2, MCU_Z + USB_Z])
         cube([USB_W, CAP_T * 4, USB_H], center = true);
@@ -815,6 +865,7 @@ module shell() {
         mcu_box();
         screw_holes();
         lcd_access();
+        reset_hole();
         seat_bottom();
         cap_screws();
         cap_solid();
