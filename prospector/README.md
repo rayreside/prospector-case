@@ -14,12 +14,12 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 
 | | upstream, no sensor | this |
 |---|---|---|
-| Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 36.4** |
-| Enclosed | 59.86 cm3 | **43.92 cm3** |
-| Plastic | 15.92 cm3 | **11.98 cm3** |
+| Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 35.4** |
+| Enclosed | 59.86 cm3 | **42.40 cm3** |
+| Plastic | 15.92 cm3 | **11.48 cm3** |
 | Parts | 3 | 2 |
 
-Same width, 16% shallower, 1 mm shorter, 27% less enclosed volume, 26% less
+Same width, 16% shallower, 2.6 mm shorter, 29% less enclosed volume, 28% less
 filament, and the screen keeps the upstream 55 degrees. Both parts watertight,
 one shell each, zero boundary edges.
 
@@ -42,11 +42,11 @@ gate is computed and echoed on every build, because not one of them is visible
 in a render:
 
 ```
-ECHO: "hat clears the ceiling by 3.69987 mm  (want 2.5)"
-ECHO: "plug room at the socket 8.78817 mm  (want 5.43)"
-ECHO: "headroom over the hat 21.3755 mm  (want 20)"
-ECHO: "tray kerbs from y 25.2476 to 41.4  (hat front 13.8)"
-ECHO: "driver at the top screws 5.60833 mm across  (want 5)"
+ECHO: "hat clears the ceiling by 2.69987 mm  (want 2.5)"
+ECHO: "plug room at the socket 7.04472 mm  (want 5.43)"
+ECHO: "headroom over the hat 20.3755 mm  (want 20)"
+ECHO: "tray kerbs from y 23.8195 to 41.4  (hat front 13.8)"
+ECHO: "driver at the top screws 6.07027 mm across  (want 5)"
 ```
 
 The 20 is measured off the real bundle, from the hat's board. The plug-room ray
@@ -80,6 +80,9 @@ out 43.0 deep; the shallower ones are slightly shorter:
 | 65 | 4 | 43.0 | 38.40 |
 | 60 | 4 | 43.0 | 37.83 |
 | **55** | **4** | **43.0** | **37.00** |
+
+That sweep was taken at `DISP_LIFT = 4`; the case is now built at 3, one
+millimetre lower and shorter throughout.
 
 For most of this project the model insisted a shallower screen cost 5-7 mm of
 depth, and it was wrong three separate ways, each found the same way -- by
@@ -250,11 +253,18 @@ the sloping interior roof made desk-down the bad orientation:
 
 | | support | bed contact | height |
 |---|---|---|---|
-| **shell, desk-down** | **424 mm2** | **1446 mm2** | 36.4 |
-| shell, front face down | 610 mm2 | 240 mm2 | 37.2 |
-| shell, back face down | 846 mm2 | 117 mm2 | 41.4 |
-| **cap, as modelled** | **21 mm2** | 69 mm2 | 27.6 |
-| cap, laid flat | 671 mm2 | 381 mm2 | 13.0 |
+| **shell, desk-down** | 555 mm2 | **1446 mm2** | 35.4 |
+| shell, front face down | 538 mm2 | 240 mm2 | 36.7 |
+| shell, back face down | 504 mm2 | 117 mm2 | 41.4 |
+| **cap, as modelled** | 638 mm2 | 69 mm2 | 26.8 |
+| cap, laid flat | 0 mm2 | 378 mm2 | 13.0 |
+
+**Read that table with the threshold in mind.** At `DISP_LIFT = 3` the chamfer
+sits at **44.81 degrees** from horizontal, two tenths of a degree under the
+45 the tool defaults to, and the whole 638 mm2 on the cap is that one surface
+crossing the line. At `--thresh 44` the same orientation scores 20 mm2. Nothing
+about the part got harder to print between 46.5 degrees and 44.8; set the
+slicer's threshold to 40 and the cap still prints standing, as it did before.
 
 All the shell's support is interior roof that nobody sees. The cap needs almost
 none standing up, but 69 mm2 of contact under a 27.6 mm part wants a brim.

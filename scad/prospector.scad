@@ -17,11 +17,11 @@
 // PRINTING. Shell desk-down as modelled; cap standing on its bottom edge, with
 // a brim. Measured with tools/overhang.py, not reasoned about:
 //
-//     shell   desk-down     424 mm2 support, 1446 on the bed
-//             front down    610                240
-//             back down     846                117
-//     cap     as modelled    21 mm2 support,   69 on the bed  <- brim it
-//             laid flat     671                381
+//     shell   desk-down     555 mm2 support, 1446 on the bed
+//             front down    538                240
+//             back down     504                117
+//     cap     as modelled   638 mm2 support,   69 on the bed  <- 44.8 deg,
+//             laid flat       0                378     see README
 //
 // All the shell's support is interior roof that nobody sees.
 //
@@ -203,7 +203,22 @@ DEPTH     = 43.00;    // *** the size knob. Back wall at y = DEPTH.
 // the assembled part, and each time the geometry was arguing with a photograph
 // and losing.
 TILT      = TILT_UPSTREAM;
-DISP_LIFT = 4.00;     // desk to the lowest point of the pocket
+// Desk to the LOWEST point of the pocket, which is its back-bottom corner on
+// the seat plane -- not the visible bottom edge of the opening, which is 5.25
+// higher up the screen.
+//
+// 3 rather than 4: it drops the screen 1 mm nearer the desk and takes the case
+// down with it, 36.37 to 35.37, for nothing in depth or width. What it spends
+// is margin. Both gates fall 1:1 with it and they run out together at 2:
+//
+//     lift 4   36.37 tall   hat 3.70   cable 21.38
+//     lift 3   35.37        hat 2.70   cable 20.38   <-- here, want 2.5 and 20
+//     lift 2   34.37        hat 1.70   cable 19.38   both fail
+//
+// Depth does not buy lift 2 back either. Lowering the display lowers the whole
+// cross-section, so the ceiling over the hat comes down with it; at DEPTH 46
+// the hat recovers to 3.90 but the cable is still 19.64.
+DISP_LIFT = 3.00;
 
 // The hat lies flat on the floor at the back, long axis front to back, so the
 // USB-C leaves through the rear cap exactly as it does now.
