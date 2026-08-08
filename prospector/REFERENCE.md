@@ -136,8 +136,16 @@ carries the mounting holes. The button is beside the USB-C, so it is up at the
 y = 41 end -- the far end from both screws, which is why the retaining rails had
 to come back.
 
-*** ITS OFFSET FROM THAT EDGE AND FROM THE CENTRELINE IS STILL UNMEASURED.
-`RESET` in prospector.scad stays false until it is.
+Measured from two datums, and they agree: **0.5 mm from the board's outer edge**
+and **2.85 mm from the connector's face**, the difference being a 2.35 Type-C
+overhang. What is *not* settled is whether either is to the button's centre or
+its near edge, and its offset across the board is not measured at all.
+
+The case does not need those numbers. Rather than a pin hole that has to be
+aimed, the floor is cut away in a strip from y = 38.1 back to the shell's rear
+edge, 18 wide -- open at the back, so the y datum does not matter, and wide
+enough that a pin reaches |x| = 8. Verified by standing a 1.5 mm column at
+several offsets and intersecting it with the built shell.
 
 ### What this rules out
 

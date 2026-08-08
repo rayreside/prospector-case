@@ -97,11 +97,32 @@ ACCESS_D   = 5.00;    // 3.60 took a shaft but not a bit
 // cantilever tab in the rear cap, was for a bare XIAO the other way up and
 // does not transfer.
 //
-// A hole rather than a plunger or a sprung tab. The floor's top is at 1.6 and
-// the button sits around z = 3 to 4, so anything captive would have to bridge
-// a couple of millimetres of air and would rattle for the rest of its life to
-// save reaching for a paperclip on an operation this user has needed once in
-// several months.
+// A SLOT open to the shell's back edge, not a pin hole, and that is the whole
+// trick. A hole has to be aimed, and neither number needed to aim it is known
+// to better than a couple of millimetres: the button was measured 0.5 from the
+// board's edge and 2.85 from the connector's face -- consistent with each
+// other, the difference being a 2.35 Type-C overhang -- but whether either is
+// to the button's centre or its near edge is not settled, and the offset ACROSS
+// the board is not measured at all. A slot spanning the board's width and open
+// at the back needs neither.
+//
+// It also gives up almost nothing. The underside is filleted at the back, so
+// the floor there is already vestigial:
+//
+//     outer surface reaches y = 38.914 at z = 0.05
+//                               39.464    0.20
+//                               40.196    0.60
+//                               41.023    1.55
+//
+// At y = 40.6 that is 0.6 mm of steeply curved floor -- a pin hole through it
+// would have come out as a smeared crescent and might have broken the back
+// edge. The slot removes a strip that was never carrying anything: the walls,
+// the kerbs and the cap's posts all sit outside |x| = 9.75.
+//
+// Not a plunger or a sprung tab either. The floor's top is at 1.6 and the
+// button sits around z = 3 to 4, so anything captive would have to bridge a
+// couple of millimetres of air and would rattle for the rest of its life to
+// save reaching for a paperclip on an operation needed once in several months.
 //
 // Where the button can be, now that the XIAO's own position is known: its
 // USB-C edge sits flush with the hat's north edge, so with the hat at
@@ -117,18 +138,29 @@ ACCESS_D   = 5.00;    // 3.60 took a shaft but not a bit
 // hat's own screw pads to y <= 19, and the display's access bores to
 // y <= 26. Anywhere inside the XIAO's footprint misses all of it.
 //
-// *** ITS OFFSET FROM THE XIAO'S NORTH EDGE AND FROM THE CENTRELINE IS STILL
-// UNMEASURED, and RESET stays false until it is. A 2.6 hole has to find a
-// button about 2 across; placing it by eye is worse than leaving it out.
+// The slot is what makes that enough. A 2.6 hole would have had to find a
+// button about 2 across, from numbers uncertain by a couple of millimetres in
+// one axis and unmeasured in the other. Opening the strip instead trades a
+// little of the underside -- which nobody sees and which was 0.6 mm thick --
+// for not having to know.
 // XIAO_Y1 and RESET_Y are set further down, where MCU_Y exists. Put here they
 // read it before it is assigned, which OpenSCAD resolves to undef rather than
 // erroring -- the hole would simply not appear and nothing would say why.
 XIAO_L     = 21.00;   // bare board, from REFERENCE.md
 XIAO_W     = 17.50;
-RESET      = false;
-RESET_X    = 0.00;    // *** across the case, + right as you face the screen
-RESET_D    = 2.60;    // a paperclip, or a 2 mm hex key
-RESET_CSK  = 5.00;    // funnel at the underside, so the pin finds it blind
+RESET      = true;
+// 18, so a pin can reach |x| = 7.5 rather than 6.5. Seeed put the button "on
+// the side of the Type-C interface", and the connector is about 9 wide, so it
+// most likely sits somewhere around |x| = 5.5 to 7 -- close enough to the edge
+// of a 16 slot that a probe fouls the rim. This leaves a 0.75 sliver of floor
+// out to the kerb at 9.75, which is thin but backed by the kerb its whole
+// length.
+RESET_W    = 18.00;
+RESET_R    = 1.50;    // rounded ends
+// Where the slot starts. Back of this and it is open to the shell's rear edge,
+// where the cap takes over -- so the opening is bounded by the cap once the
+// case is closed, and reads as a deliberate letterbox rather than a broken
+// corner.
 
 // Below the module the seat is carrying nothing -- the lower bosses sit at
 // v = -11.285 and everything under them is there only because the ring was
@@ -343,10 +375,15 @@ function hat_top_at(y) = y < TALL_Y ? PCB_Z + PCB_T : MCU_Z + MCU_DZ;
 // to the south is the strip carrying the mounting holes.
 XIAO_Y1 = MCU_Y + MCU_CLR + MCU_DY;      // north edge, flush with the hat's
 XIAO_Y0 = XIAO_Y1 - XIAO_L;
-RESET_Y = XIAO_Y1 - 4.00;                // *** placeholder, 4 in from that edge
+// Front edge of the slot. 3 in from the board's north edge covers the button
+// wherever in that range it turns out to sit -- 0.5 from the edge to its centre
+// puts it at 40.6, 0.5 to its near edge puts it at about 39.6, and both fall
+// inside 38.1..41.4 with room to spare.
+RESET_Y = XIAO_Y1 - 3.00;
 echo(str("XIAO spans y ", XIAO_Y0, "..", XIAO_Y1, ", x +/-", XIAO_W / 2,
-         RESET ? str("; reset pin at ", RESET_X, ", ", RESET_Y)
-               : "; reset hole OFF, position unmeasured"));
+         RESET ? str("; reset slot ", RESET_W, " wide, y ", RESET_Y, "..",
+                     DEPTH - CAP_T)
+               : "; reset slot OFF"));
 
 // Where the tray's side kerbs are allowed to start. The display's two lower
 // access bores come down through this part of the case -- they leave the
@@ -733,15 +770,14 @@ module cap_screws() {
         }
 }
 
-// Bored from the underside, funnelled where it opens so a pin can find it
-// without the case being turned over and inspected.
+// Cut through the floor from RESET_Y back to where the shell ends, so the
+// button can be reached with anything to hand.
 module reset_hole() {
     if (RESET)
-        translate([RESET_X, RESET_Y, -1]) {
-            cylinder(d = RESET_D, h = FLOOR + 2);
-            cylinder(d1 = RESET_CSK, d2 = RESET_D,
-                     h = (RESET_CSK - RESET_D) / 2 + 1);
-        }
+        hull() for (sx = [-1, 1], sy = [0, 1])
+            translate([sx * (RESET_W / 2 - RESET_R),
+                       RESET_Y + sy * (DEPTH - CAP_T - RESET_Y), -1])
+                cylinder(r = RESET_R, h = FLOOR + 2);
 }
 
 module usb_slot() {
