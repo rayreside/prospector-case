@@ -818,6 +818,32 @@ DRIVER_FIT = 2 * ((SPLIT_Y - SCR_Y) * cos(TILT)
 echo(str("driver at the top screws ", DRIVER_FIT, " mm across  (want ",
          ACCESS_D, ")"));
 
+// THE SEAM IS A LAP NOW, NOT A BUTT, AND THIS IS WHY.
+//
+// The cap seats by travelling forward until its back plate meets the shell at
+// y = 41.4. Its roof tip arrives at y = SPLIT_Y at the same instant, because
+// both were cut on that one plane -- so the joint was over-constrained: two
+// faces, in different planes, both required to close at once, on two parts
+// printed separately.
+//
+// On the part the tip lands first. Then the screws keep pulling, the back plate
+// cannot close, and the roof has nowhere to go but backwards -- which is
+// exactly the small gap that showed up.
+//
+// I had checked shell against cap and found they only touched, and called it a
+// butt joint located by two screws. That was right about the BACK plane and
+// blind to this one: a face square to the direction of travel must not touch
+// before the seating face does.
+//
+// So the cap's tip stops SEAM_CLR short, and the shell's outer skin laps back
+// over the gap. The clearance goes in y, where nothing sees it; the lap's
+// underside and the tip's top face still meet, so the shell also holds the
+// cap's roof down instead of merely abutting it.
+SEAM_CLR  = 0.30;     // the cap's roof tip stops this far short of SPLIT_Y
+SEAM_LAP  = 2.00;     // how far the shell's skin reaches back over it
+SEAM_T    = 0.80;     // half of CAP_T, so neither member is thinner than that
+SEAM_DROP = SEAM_T * sqrt(1 + CH_M * CH_M);
+
 module cap_solid() {
     intersection() {
         difference() { outer(); trim(DEPTH - CAP_T, 0, BACK_R, CAP_DROP); }
@@ -825,9 +851,32 @@ module cap_solid() {
     }
 }
 
+// The outer skin over the lap band, which stays with the SHELL. Bounded by
+// outer() and by a plane parallel to the chamfer -- not by cap_solid(), whose
+// own boundary is a differently rounded trim and would leave slivers where the
+// two describe the same surface.
+module seam_lip() {
+    intersection() {
+        difference() { outer(); trim(DEPTH + 1, -50, 0.5, SEAM_DROP); }
+        translate([-100, SPLIT_Y, -100]) cube([200, SEAM_LAP, 200]);
+    }
+}
+
+// What the shell gives up: the cap's region less the lip it keeps.
+module cap_void() { difference() { cap_solid(); seam_lip(); } }
+
 module cap() {
     difference() {
-        cap_solid();
+        intersection() {
+            cap_solid();
+            translate([-100, SPLIT_Y + SEAM_CLR, -100]) cube(200);
+        }
+        // its tip is the inner half, so the shell's skin can lie over it
+        intersection() {
+            difference() { outer(); trim(DEPTH + 1, -50, 0.5, SEAM_DROP); }
+            translate([-100, -100, -100])
+                cube([200, 100 + SPLIT_Y + SEAM_LAP + SEAM_CLR, 200]);
+        }
         usb_slot();
         cap_screws();
     }
@@ -930,7 +979,7 @@ module shell() {
         reset_hole();
         seat_bottom();
         cap_screws();
-        cap_solid();
+        cap_void();
     }
     }
     hat_screws();
