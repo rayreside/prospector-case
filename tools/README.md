@@ -32,6 +32,71 @@ delta across a z band means both parts are prismatic there and the section
 itself is wrong. A delta that varies with z means the reference has features
 the candidate lacks.
 
+## `clusters.py` — where two sections disagree
+
+```bash
+python tools/clusters.py <reference.stl> <candidate.stl> 6.0
+python tools/clusters.py ref.stl cand.stl 6.0 0.025 0.02   # step, min area
+```
+
+Labels the disagreement into connected clusters and gives each one's extent, in
+both directions separately. `slice.py` says how much and at what height; this
+says whereabouts, which is the part that leads to a cause.
+
+Splitting the two directions matters. The mountains once read −0.14% on volume
+because a 12 mm² deficit on one wall was cancelling a 12 mm² surplus elsewhere;
+fixing the deficit made the total look worse and the part better.
+
+## `thin.py` — features too thin to print
+
+```bash
+python tools/thin.py build/urchin_mountains.stl 6.0 0.20
+```
+
+Opens the section with a disc and reports what the opening removed — anything
+narrower than twice the radius cannot hold the disc. Pass about half a nozzle
+width. Convex corners lose only r²(1−π/4), so a hit near that size is noise.
+
+This found what diffing could not. The printed mountains carry no feature under
+0.4 mm anywhere; the port had eighteen, one of them a 5.70 mm tongue just
+0.047 mm wide, which a 0.10 mm section grid had stepped straight over.
+
+It also brackets a threshold from both sides: if the printed part drops a 0.437
+sliver but keeps a 0.485 strip, the radius that reproduces it is pinned to a
+window rather than fitted to a curve.
+
+## `fitedge.py` — is this edge straight, and at what angle
+
+```bash
+python tools/fitedge.py <part.stl> 6.0 128.4 135.0 44.0 86.0 max
+```
+
+Traces one boundary of the window row by row and fits a line. The residual is
+the useful part: at the raster floor (`step/√12`) the edge is exactly straight
+and the angle can be trusted; well above it, the window spans more than one
+edge and the fit means nothing.
+
+Check an angle at two heights before believing it. If they differ the part
+isn't prismatic and one section was never going to describe it.
+
+## `raster.py` — shared section fill
+
+Not run directly. `clusters.py`, `thin.py` and `fitedge.py` all fill a section
+onto a grid through it.
+
+Both crossing tests are half-open rather than strict, which is not fussiness:
+the strict form drops any segment with an endpoint exactly on the scan line,
+and on a tessellated mesh vertices land on round coordinates constantly.
+`probe.py` had that bug and it dropped two of four crossings at y=20 on the
+printed mountains — and because the survivors are paired off in order, the
+spans it printed were plausible and wrong.
+
+**Resolution is the recurring trap in all of these.** A feature thinner than
+one cell can vanish entirely. An edge that merely crosses a cell boundary
+during a parameter sweep reads as a whole cluster appearing, which looks like a
+cliff in the numbers and is not one. Keep the step well under the smallest
+thing being judged.
+
 ## `build.py` — export every part
 
 ```bash

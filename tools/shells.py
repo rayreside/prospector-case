@@ -1,7 +1,8 @@
 """Report each connected shell of an STL separately: bbox, volume, triangles."""
 import sys
 import numpy as np
-sys.path.insert(0, r"C:\Repos\urchin-cases\tools")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from stlstat import load_stl, volume
 
 path = sys.argv[1]
