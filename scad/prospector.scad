@@ -103,15 +103,30 @@ ACCESS_D   = 5.00;    // 3.60 took a shaft but not a bit
 // save reaching for a paperclip on an operation this user has needed once in
 // several months.
 //
-// *** POSITION UNMEASURED. RESET stays false until it is. What is clear down
-// there, if it helps in choosing: the hat's screw pads sit at x = +/-8.55 over
-// y = 14.5..19, the tray kerbs run down both sides from y = 23.8 at |x| > 11.25,
-// the display's access bores come through at |x| = 12.5..17.5 over y = 17.5..26,
-// and the rear cap's post feet are at |x| = 13..19 behind y = 35.4. Anything
-// with |x| <= 10 between y = 20 and 41 misses all of it.
+// Where the button can be, now that the XIAO's own position is known: its
+// USB-C edge sits flush with the hat's north edge, so with the hat at
+// y = 14.1..41.1 and the XIAO 21.0 x 17.5, the chip spans y = 20.1..41.1 and
+// x = +/-8.75. The 6 mm of bare hat south of that is the strip carrying the
+// mounting holes, which agrees with SOCKET_Y and the screws at y = 16.75.
+//
+// The button is beside the USB-C, so it is near y = 41 -- the far end from the
+// screws, which is exactly why MCU_HOOKS had to come back.
+//
+// That whole region is clear underneath, which is the good news: the tray kerbs
+// and rails keep to |x| >= 9.75, the rear cap's post feet to |x| >= 13, the
+// hat's own screw pads to y <= 19, and the display's access bores to
+// y <= 26. Anywhere inside the XIAO's footprint misses all of it.
+//
+// *** ITS OFFSET FROM THE XIAO'S NORTH EDGE AND FROM THE CENTRELINE IS STILL
+// UNMEASURED, and RESET stays false until it is. A 2.6 hole has to find a
+// button about 2 across; placing it by eye is worse than leaving it out.
+// XIAO_Y1 and RESET_Y are set further down, where MCU_Y exists. Put here they
+// read it before it is assigned, which OpenSCAD resolves to undef rather than
+// erroring -- the hole would simply not appear and nothing would say why.
+XIAO_L     = 21.00;   // bare board, from REFERENCE.md
+XIAO_W     = 17.50;
 RESET      = false;
 RESET_X    = 0.00;    // *** across the case, + right as you face the screen
-RESET_Y    = 30.00;   // *** from the case's front face
 RESET_D    = 2.60;    // a paperclip, or a 2 mm hex key
 RESET_CSK  = 5.00;    // funnel at the underside, so the pin finds it blind
 
@@ -321,6 +336,17 @@ PCB_T  = 1.60;        // *** ESTIMATED: hat board thickness
 SOCKET_Y = 7.10;      // south edge of the hat to the near edge of the socket
 TALL_Y = MCU_Y + MCU_CLR + SOCKET_Y;
 function hat_top_at(y) = y < TALL_Y ? PCB_Z + PCB_T : MCU_Z + MCU_DZ;
+
+// The XIAO's own footprint, which is what bounds where the reset button can be.
+// Its USB-C edge sits flush with the hat's north edge -- measured -- so the
+// board runs back from there by its own length, and the 6 mm of bare hat left
+// to the south is the strip carrying the mounting holes.
+XIAO_Y1 = MCU_Y + MCU_CLR + MCU_DY;      // north edge, flush with the hat's
+XIAO_Y0 = XIAO_Y1 - XIAO_L;
+RESET_Y = XIAO_Y1 - 4.00;                // *** placeholder, 4 in from that edge
+echo(str("XIAO spans y ", XIAO_Y0, "..", XIAO_Y1, ", x +/-", XIAO_W / 2,
+         RESET ? str("; reset pin at ", RESET_X, ", ", RESET_Y)
+               : "; reset hole OFF, position unmeasured"));
 
 // Where the tray's side kerbs are allowed to start. The display's two lower
 // access bores come down through this part of the case -- they leave the

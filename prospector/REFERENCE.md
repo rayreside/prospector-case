@@ -129,8 +129,15 @@ whole stack is inverted, so the component side the button sits on points at the
 underside -- upstream's cantilever tab in the rear cap was for a bare XIAO the
 other way up and does not transfer.
 
-*** ITS POSITION ACROSS THE BOARD IS UNMEASURED. `RESET` in prospector.scad
-stays false until it is.
+The XIAO's **USB-C edge sits flush with the hat's north edge** -- measured. With
+the hat at y = 14.1..41.1 and the board 21.0 x 17.5, that puts the XIAO at
+y = 20.1..41.1, x = +/-8.75, and leaves exactly the 6 mm strip to the south that
+carries the mounting holes. The button is beside the USB-C, so it is up at the
+y = 41 end -- the far end from both screws, which is why the retaining rails had
+to come back.
+
+*** ITS OFFSET FROM THAT EDGE AND FROM THE CENTRELINE IS STILL UNMEASURED.
+`RESET` in prospector.scad stays false until it is.
 
 ### What this rules out
 
