@@ -25,9 +25,16 @@ repository's licensing.
 
 ## Not in this repository
 
-A stand for the Prospector dongle lives outside version control, in a
-gitignored `personal/` folder. Its proportions were measured from a third-party
-model published under CC BY-NC-SA, and while measured ratios are not the
-copyrightable part of a design, Non-Commercial and Share-Alike are terms that
-cannot quietly coexist with MIT if that judgement were ever wrong. It is kept
-out rather than reasoned about.
+A stand for the Prospector dongle, and an adapter letting a display kit carry
+the dongle, were both explored and are **not part of this project**. Their
+proportions were taken from a third-party model by **Tortel3D**, published
+under CC BY-NC-SA.
+
+Measured ratios are not the copyrightable part of a design, but Non-Commercial
+and Share-Alike are terms that cannot quietly coexist with MIT if that
+judgement were ever wrong. So the work was kept out of version control while it
+existed, and has since been removed outright — the files, the built STLs, and
+the `personal/` folder that held them.
+
+The credit above is for that exploratory work. Nothing in this repository
+derives from that model.
