@@ -74,3 +74,9 @@ $RECYCLE.BIN/
 # --------------------------------------------------------------- Claude Code
 .claude/settings.local.json
 build/
+
+# ------------------------------------------------------- personal, not shared
+# Work that is mine to print but not mine to publish -- anything derived from
+# or shaped by third-party models whose licence does not sit with this repo's.
+# The Prospector case and tools are MIT; this folder is deliberately outside it.
+personal/
