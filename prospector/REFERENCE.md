@@ -141,6 +141,12 @@ and **2.85 mm from the connector's face**, the difference being a 2.35 Type-C
 overhang. What is *not* settled is whether either is to the button's centre or
 its near edge, and its offset across the board is not measured at all.
 
+**Which side: the +x side**, the right as you face the screen. Reported as "to
+the left of the port, looking at the bottom with the port pointing up" -- a
+mirrored view. Seen from outside the underside, +y cross +x = -z points at the
+viewer, so +y to +x is counterclockwise, which is their left. So their left is
+our +x. The button therefore sits at roughly x = +6, y = 40.6.
+
 The case does not need those numbers. Rather than a pin hole that has to be
 aimed, the floor is cut away in a strip from y = 38.1 back to the shell's rear
 edge, 18 wide -- open at the back, so the y datum does not matter, and wide

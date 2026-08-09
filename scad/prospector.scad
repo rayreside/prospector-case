@@ -133,6 +133,21 @@ ACCESS_D   = 5.00;    // 3.60 took a shaft but not a bit
 // The button is beside the USB-C, so it is near y = 41 -- the far end from the
 // screws, which is exactly why MCU_HOOKS had to come back.
 //
+// And it is on the +x side, the right as you face the screen. Reported as "to
+// the LEFT of the port, looking at the bottom with the port pointing up", which
+// is a mirrored view and worth writing the conversion down rather than trusting
+// twice. Seen from outside, the underside's viewer looks along +z; in this
+// frame +y cross +x = -z, which points at that viewer, so turning from +y (up
+// in their view) to +x is counterclockwise -- to their left. Assuming instead
+// that they laid it face-down and looked from above gives the same answer: a
+// 180-degree flip about the away axis sends +x to their left either way.
+//
+// So the button is around x = +6, y = 40.6. The slot is symmetric and covers
+// both sides, which is deliberate -- a mirroring argument is not something to
+// stake reachability on, and the floor being asymmetric would buy nothing.
+// Verified regardless: a 1.5 mm pin is clear at (6.0, 40.3), (6.5, 40.6),
+// (7.0, 40.6) and (8.0, 40.3).
+//
 // That whole region is clear underneath, which is the good news: the tray kerbs
 // and rails keep to |x| >= 9.75, the rear cap's post feet to |x| >= 13, the
 // hat's own screw pads to y <= 19, and the display's access bores to
