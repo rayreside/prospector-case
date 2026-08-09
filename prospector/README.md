@@ -16,7 +16,7 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 35.4** |
 | Enclosed | 59.86 cm3 | **42.40 cm3** |
-| Plastic | 15.92 cm3 | **11.48 cm3** |
+| Plastic | 15.92 cm3 | **11.29 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 2.6 mm shorter, 29% less enclosed volume, 28% less
@@ -171,6 +171,26 @@ it is going to carry anything printed on it.
 > The bent panel's only cost is that the roof's outer face prints against the
 > build plate. The split's cost was every feature in it having none to give.
 
+### The seam
+
+The cap does not merely meet the shell at y = 30, it laps under it. The shell
+keeps the outer 0.80 of the chamfer for 2 mm past `SPLIT_Y`; the cap's roof tip
+is the inner 0.80 and stops 0.30 short. Sectioned at y = 31 the shell holds
+24.713..25.840 and the cap 23.585..24.713 — meeting on a plane, so the shell
+also holds the roof down rather than only abutting it.
+
+It is a lap because the butt did not work, for a reason that showed up only on
+the part. Two faces in different planes — the back at y = 41.4 and the roof tip
+at y = 30 — were both required to close in the same instant, on two separately
+printed parts. Whichever lands first wins, and it was the tip: the back plate
+could not close, the screws kept pulling, and the roof bent backwards. The
+clearance now goes in y, where the lap hides all but a 0.3 line.
+
+**The lesson, which cost a print.** A zero-volume intersection between two parts
+says they do not overlap. It does not say they can be assembled. A face square
+to the direction of travel must not touch before the seating face does, and no
+static check in this repo can see the difference.
+
 ### The rear screws
 
 The pilot has been wrong in both directions, which is worth recording because
@@ -284,12 +304,14 @@ out through the pocket.
 
 ## Still to do
 
-- **Shell and cap meet at exactly 0.00**, because `cap_solid()` defines both
-  surfaces. Checked rather than assumed: intersecting the two parts gives a
-  zero-volume result, so they touch on the y = 41.4 plane and nowhere overlap.
-  That is a butt joint located by two screws, which is what it should be — the
-  worry only applies to a feature that has to *enter* the other part, and there
-  is no longer one.
+- ~~Shell and cap meet at exactly 0.00~~ — **this was the wrong conclusion, and
+  the printed part proved it.** Intersecting the two solids gives zero volume,
+  and I read that as a butt joint located by two screws, which is what it should
+  be. Right about the y = 41.4 plane, blind to the other one: the cap's roof tip
+  met the shell's roof edge at y = 30, also at exactly 0.00, and that face is
+  square to the direction the cap travels to seat. On the part the tip landed
+  first, the screws kept pulling, and the roof bent backwards — opening the very
+  gap the joint was meant to close. The seam is a lap now; see below.
 - **The cap's bottom-back fillet reaches 0.12 mm from the hat.** The `BACK_R`
   rounding where the cap meets the desk curves forward of y = 41.4 by 0.18, and
   the hat's rear edge is at 41.1. Positive, but it is the tightest unintended
