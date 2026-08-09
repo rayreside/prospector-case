@@ -1,7 +1,7 @@
 # Verification tools
 
-Used to check `scad/urchin.scad` against the printed STLs in `high-profile/`.
-The STLs are the milestone-1 ground truth; the OpenSCAD port is measured
+Used to check `scad/prospector.scad` against measurements taken off the
+upstream STLs. The measurements are the ground truth; the model is checked
 against them, never the other way round.
 
 Requires Python 3 and numpy. Both scripts read ASCII and binary STL.
@@ -9,7 +9,7 @@ Requires Python 3 and numpy. Both scripts read ASCII and binary STL.
 ## `stlstat.py` — bulk properties
 
 ```bash
-python tools/stlstat.py high-profile/right/urchin_hp_top_right.stl
+python tools/stlstat.py build/prospector_shell.stl
 ```
 
 Reports triangle count, bounding box, volume, shell count, and edge
@@ -50,7 +50,7 @@ fixing the deficit made the total look worse and the part better.
 ## `thin.py` — features too thin to print
 
 ```bash
-python tools/thin.py build/urchin_mountains.stl 6.0 0.20
+python tools/thin.py build/prospector_shell.stl 6.0 0.20
 ```
 
 Opens the section with a disc and reports what the opening removed — anything
@@ -97,32 +97,6 @@ during a parameter sweep reads as a whole cluster appearing, which looks like a
 cliff in the numbers and is not one. Keep the step well under the smallest
 thing being judged.
 
-## `build.py` — export every part
-
-```bash
-python tools/build.py
-```
-
-Writes all four parts to `build/` and prints each volume against the printed
-reference. `--fused` builds the fused-mountains variant instead.
-
-## `render.py` — look at it
-
-```bash
-python tools/render.py mountains
-python tools/render.py top --cut y --cut-at 50 --at 185 50 4 --dist 135
-```
-
-Renders the model and its printed counterpart from the same camera, in the
-canonical view (top down, thumb cluster bottom left). OpenSCAD's own default
-camera is that view turned 180 degrees, so GUI screenshots are upside down.
-
-`--cut x|y|z` sections the model. This is the one that finds things: of the
-seven real errors in this port, six were interior and invisible from any
-outside view at any render quality. The camera swings to an elevation
-automatically, because a section viewed from above is edge-on and shows
-nothing.
-
 ## Seeing anything in the OpenSCAD GUI
 
 Two settings do almost all the work, and both are off by default:
@@ -135,12 +109,3 @@ Two settings do almost all the work, and both are off by default:
 Perspective rather than orthographic also helps read depth. Even so the
 viewport has no shading worth the name -- for judging outside shape, export
 with `build.py` and open the STL in a real viewer.
-
-## Rendering the OpenSCAD parts
-
-```bash
-openscad -D 'part="top"' -o top.stl scad/urchin.scad
-```
-
-Valid parts: `top`, `mountains`, `bottom`, `all`. `shield` is declared but not
-yet implemented.

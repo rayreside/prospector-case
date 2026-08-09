@@ -13,15 +13,10 @@ why the list below is credit rather than a set of licence obligations.
 
 | | by | licence | relationship |
 |---|---|---|---|
-| [Urchin](https://github.com/duckyb/urchin) 36-key split keyboard | duckyb | MIT | the keyboard these cases are for. The case outlines and hardware positions follow it |
 | [Prospector](https://github.com/carrefinho/prospector) ZMK dongle | carrefinho | CERN-OHL-P-2.0 | the dongle case in `scad/prospector.scad` is dimensioned from measurements taken off its published STLs. Provenance for every number is in [prospector/REFERENCE.md](prospector/REFERENCE.md) |
 
-The *Urchin Plate Case* the keyboard cases derive from is the author's own
-earlier design, so it carries no separate terms.
-
-Both upstream licences are permissive — MIT and the permissive variant of the
-CERN Open Hardware Licence. Neither is reciprocal, so neither reaches into this
-repository's licensing.
+That licence is the permissive variant of the CERN Open Hardware Licence. It is
+not reciprocal, so it does not reach into this repository's licensing.
 
 ## Not in this repository
 

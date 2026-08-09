@@ -12,7 +12,7 @@ walks each loop and decimates it with Douglas-Peucker.
 
 LIMITATION, and it matters: this is only trustworthy on clean meshes. On
 OpenSCAD output it returns exactly the loops you expect. On the Blender-derived
-reference STLs it fragments -- urchin_hp_bottom_right.stl carries 32
+reference STLs it fragments -- a sectioned case bottom carries 32
 non-2-manifold edges, and loop walking has no correct answer at a vertex where
 three faces meet, so the outer boundary comes back in dozens of pieces. Check
 the reported loop count and areas before believing any of it; if the shape you

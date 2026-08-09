@@ -38,8 +38,6 @@ cache/
 *.gco
 # Bambu / Orca / Prusa project files
 *.3mf
-!high-profile/**/*.3mf
-!low-profile/**/*.3mf
 
 # --------------------------------------------------------------- CAD scratch
 # Autosaves and recovery, not the real files
