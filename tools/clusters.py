@@ -27,16 +27,20 @@ from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from stlstat import load_stl
-from raster import section_segments, fill
+from raster import section_segments, fill, grid
 
 ref_path, cand_path, z = sys.argv[1], sys.argv[2], float(sys.argv[3])
 step = float(sys.argv[4]) if len(sys.argv) > 4 else 0.05
 min_area = float(sys.argv[5]) if len(sys.argv) > 5 else 0.05
 
-xs = np.arange(126.767, 242.601, step)
-ys = np.arange(14.311, 107.688, step)
-ref = fill(section_segments(load_stl(ref_path), z), xs, ys)
-cand = fill(section_segments(load_stl(cand_path), z), xs, ys)
+A, B = load_stl(ref_path), load_stl(cand_path)
+# Padded, and taken from the meshes rather than the case bbox. Starting a row
+# exactly on the part's extreme puts a cell on the boundary, and the two meshes
+# then disagree along the whole edge -- which came back as a 2.3 mm2 cluster of
+# zero height sitting on y=14.311, entirely an artefact of where the grid began.
+xs, ys = grid([A, B], step)
+ref = fill(section_segments(A, z), xs, ys)
+cand = fill(section_segments(B, z), xs, ys)
 cell = step * step
 
 print(f"z={z}  step {step}  ref {ref.sum() * cell:.1f} mm2  "

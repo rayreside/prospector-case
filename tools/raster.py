@@ -55,7 +55,16 @@ def fill(segs, xs, ys):
 
 
 def grid(meshes, step, pad=0.5):
-    """Common xs, ys covering every mesh given, at the requested step."""
+    """Common xs, ys covering every mesh given, sampled at cell centres.
+
+    The half-step offset is not cosmetic. Part coordinates are round numbers and
+    so are useful step sizes, so an un-offset grid puts rows exactly on model
+    edges -- and on a horizontal edge the two meshes' float32 boundaries land
+    either side of it, which came back as a 2.3 mm2 cluster of zero height
+    sitting on y=14.311, the case's own bottom edge. Sampling at centres keeps
+    rows off the coordinates a model is likely to be built on.
+    """
     v = np.vstack([m.reshape(-1, 3) for m in meshes])
     lo, hi = v.min(0) - pad, v.max(0) + pad
-    return np.arange(lo[0], hi[0], step), np.arange(lo[1], hi[1], step)
+    return (np.arange(lo[0] + step / 2, hi[0], step),
+            np.arange(lo[1] + step / 2, hi[1], step))
