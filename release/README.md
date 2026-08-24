@@ -5,21 +5,22 @@ are checked in so that a `git pull` puts the printable parts on disk -- the
 repository is the sync channel, and not everyone who wants to print this has
 OpenSCAD installed.
 
-Built with OpenSCAD 2021.01 from the tree at `8ff480e`, the commit that made
-the case's corners concentric with the display's.
+Built with OpenSCAD 2021.01, from the commit that corrected the module's
+corner radius to the vendor's R5 -- which is what finally made the case's
+corners concentric with the display's, and returned RIM_R to 6.90.
 
 | | shell | cap |
 |---|---|---|
-| triangles | 3226 | 776 |
+| triangles | 3658 | 864 |
 | bounding box | 42.800 x 41.400 x 35.368 | 42.800 x 12.700 x 25.408 |
-| volume | 9.5354 cm3 | 1.9026 cm3 |
+| volume | 9.5591 cm3 | 1.8722 cm3 |
 | shells | 1 | 1 |
 | non-2-manifold edges | 0 | 0 |
 | boundary edges | 0 | 0 |
 
 `python tools/stlstat.py release/prospector_shell.stl` reproduces that column,
 which is the check that you have the file you think you have. The shell at
-27.13 cm3 and three shells is the one with the ghosted display and XIAO
+27.1 cm3 and three shells is the one with the ghosted display and XIAO
 exported inside it -- see below.
 
 ## Printing
