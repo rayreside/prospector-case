@@ -23,7 +23,7 @@ print.
 
 `show_parts` ghosts the display and the XIAO in place. That is what you want on
 screen and not what you want in an STL: left on -- and it is on by default --
-the shell exports with both of them inside it, three shells and 27.13 cm3
+the shell exports with both of them inside it, three shells and 27.25 cm3
 against one and 9.54. The cap never draws them, so its line needs nothing.
 Either way `tools/stlstat.py` says at once which one you have.
 

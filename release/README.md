@@ -19,7 +19,7 @@ the case's corners concentric with the display's.
 
 `python tools/stlstat.py release/prospector_shell.stl` reproduces that column,
 which is the check that you have the file you think you have. The shell at
-27.13 cm3 and three shells is the one with the ghosted display and XIAO
+27.25 cm3 and three shells is the one with the ghosted display and XIAO
 exported inside it -- see below.
 
 ## Printing
@@ -52,7 +52,7 @@ openscad -D 'part="cap"' -o release/prospector_cap.stl scad/prospector.scad
 
 `show_parts` is on by default and ghosts the display and the XIAO in place. On
 screen that is the point; in an STL it is the display and the XIAO exported
-inside the shell -- three shells and 27.13 cm3. The cap never draws them, so
+inside the shell -- three shells and 27.25 cm3. The cap never draws them, so
 its line needs nothing.
 
 Two things follow from checking these in:
