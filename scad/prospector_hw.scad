@@ -59,4 +59,22 @@ TILT_UPSTREAM = 55.0;
 WALL      = 1.60;
 BEZEL     = 1.70;     // material around the module, in the screen plane
 LIP       = 1.00;     // how far the front frame overhangs the module face
-RIM_R     = 7.00;     // cross-section corner radius, matches the upstream look
+// Cross-section corner radius -- and it is not the free styling number it was
+// taken for. The section is the module's pocket grown by BEZEL on every side,
+// so its corners have to be the pocket's corners grown by that same BEZEL, or
+// the frame stops being a constant width.
+//
+// 7.00 was carried over as "the upstream look", and upstream can afford it:
+// its display sits in `disp_mount`, a separate plate, so the radius of the
+// body's outside never has to answer to the module's. Here the outside of the
+// case and the frame round the display are one face. At 7.00 that face ran the
+// intended 1.70 on the flats and 0.83 at the diagonal -- measured off the mesh
+// at 0.829 -- and the lip, which is wider than the pocket and lands on that
+// same face, overhung the case corner by 0.13 with nothing underneath it. On
+// the printed part it reads as exactly what it is: a case corner rounder than
+// the display's, with the black lip standing proud of the plastic at it.
+//
+// Concentric instead. The identity to keep is SEC - 2 * RIM_R == POCK - 2 *
+// POCK_R on both axes -- one rectangle underneath, two radii, constant frame.
+// prospector.scad measures it and echoes it on every build.
+RIM_R     = DISP_R + DISP_CLR + BEZEL;   // 4.90, concentric with the pocket

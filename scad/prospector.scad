@@ -339,9 +339,10 @@ POCK_R = DISP_R + DISP_CLR;
 // and the material around the opening becomes the full 1.7 bezel instead of a
 // fragile ledge. Upstream's is flush, but its ring is 0.835 and no better.
 LIP_BORE = false;
+LIP_R  = DISP_R + (LIP_W - DISP_W) / 2;  // the lip's own corner radius
 BORE_W = LIP_W + 2 * LIP_CLR;         // counterbore the lip seats in
 BORE_H = LIP_H + 2 * LIP_CLR;
-BORE_R = DISP_R + (LIP_W - DISP_W) / 2;
+BORE_R = LIP_R;
 RIM_MIN = 0.85;                       // material left around the counterbore
 // The cross-section is now the larger of what the module's body needs and what
 // the lip's counterbore leaves standing. Upstream keeps 0.835 mm around its
@@ -355,6 +356,23 @@ SEC_H  = LIP_BORE ? max(POCK_H + 2 * BEZEL, BORE_H + 2 * RIM_MIN)
 // underside and the lip stands on it.
 W_RIM  = LIP_BORE ? DISP_T : DISP_T - LIP_T;
 W_BACK = -40;                         // prism runs well past the trim planes
+
+// What the frame actually measures, all the way round. BEZEL is only its width
+// on the flats; the corners are where the section's rounding and the module's
+// rounding meet, and where a mismatch shows first. Both outlines are the same
+// kind of shape -- a rectangle grown by a radius -- so the material outside an
+// inner outline is RIM_R less the distance from each point of the inner arc to
+// the outer rectangle. Concentric corners make that a constant, which is the
+// whole point, but it is measured rather than assumed: change RIM_R and this
+// says what it costs instead of failing quietly on the printed part.
+function frame_min(w, h, r) =
+    min([for (a = [0 : 1 : 90])
+        RIM_R - norm([max(0, w / 2 - r + r * cos(a) - (SEC_W / 2 - RIM_R)),
+                      max(0, h / 2 - r + r * sin(a) - (SEC_H / 2 - RIM_R))])]);
+FRAME_MIN = frame_min(POCK_W, POCK_H, POCK_R);
+// With LIP_BORE off the lip lands on the front face, so this is the case that
+// shows around it. Negative means the lip hangs over the corner in the air.
+LIP_SHOW  = frame_min(LIP_W, LIP_H, LIP_R);
 
 // Frontmost point of the case at y = 0; pocket's lowest point at DISP_LIFT.
 CY = SEC_H / 2 * cos(TILT) + W_RIM * sin(TILT);
@@ -519,6 +537,11 @@ WIRE_FIT = max([for (y = HAT_YS) if (y >= TALL_Y) ceil_at(y)]) - (PCB_Z + PCB_T)
 
 echo(str("section ", SEC_W, " x ", SEC_H, ", depth ", DEPTH,
          ", screen ", TILT, " deg, lift ", DISP_LIFT));
+echo(str("frame round the pocket ", FRAME_MIN, " mm at its thinnest  (want ",
+         BEZEL, ", its width on the flats)"));
+if (!LIP_BORE)
+    echo(str("case showing round the lip ", LIP_SHOW, " mm at its thinnest  (want ",
+             (SEC_W - LIP_W) / 2, ", ditto)"));
 echo(str("hat clears the ceiling by ", MCU_FIT, " mm  (want ", SLACK, ")"));
 echo(str("plug room at the socket ", CONN_FIT, " mm  (want ", CONN_NEED, ")"));
 echo(str("headroom over the hat ", WIRE_FIT, " mm  (want ", WIRE_UP, ")"));
