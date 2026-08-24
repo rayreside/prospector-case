@@ -32,6 +32,31 @@ STLs, checked in and refreshed with the geometry, so a `git pull` puts the
 printable parts on disk -- with the figures to check them against and the
 orientations to print them in.
 
+## The dress-up variant
+
+An alternative version of the same case, with a pad and socket on the crown for
+plug-in hats and a socket in each side wall for plug-in arms. It is a flag, not
+a fork — off by default, and the default build is unchanged:
+
+```bash
+openscad -D 'part="shell"' -D 'show_parts=false' -D 'DRESS=true' -o build/prospector_shell_dress.stl scad/prospector.scad
+```
+
+The rear cap is unaffected; print the ordinary one. The accessories are
+separate:
+
+```bash
+openscad -D 'part="hat"'    -o build/prospector_hat.stl    scad/prospector_dress.scad
+openscad -D 'part="arm"'    -o build/prospector_arm.stl    scad/prospector_dress.scad
+openscad -D 'part="coupon"' -o build/prospector_coupon.stl scad/prospector_dress.scad
+```
+
+Print two arms, mirrored. Print the coupon first — it is what tells you the
+peg clearance your printer actually gives. The socket and the peg share
+[`scad/prospector_plug.scad`](scad/prospector_plug.scad) so they cannot drift
+apart, and the reasoning is in
+[prospector/README.md](prospector/README.md#the-dress-up-variant).
+
 ## Checking it
 
 `tools/` holds the verification scripts — cross-section diffs, thin-feature
