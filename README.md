@@ -27,6 +27,11 @@ the shell exports with both of them inside it, three shells and 27.13 cm3
 against one and 9.54. The cap never draws them, so its line needs nothing.
 Either way `tools/stlstat.py` says at once which one you have.
 
+You do not have to build it to print it. [`release/`](release/) holds the two
+STLs, checked in and refreshed with the geometry, so a `git pull` puts the
+printable parts on disk -- with the figures to check them against and the
+orientations to print them in.
+
 ## Checking it
 
 `tools/` holds the verification scripts — cross-section diffs, thin-feature
