@@ -15,8 +15,8 @@ provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.
 | | upstream, no sensor | this |
 |---|---|---|
 | Envelope | 43.2 x 51.4 x 38.0 | **42.8 x 43.0 x 35.4** |
-| Enclosed | 59.86 cm3 | **42.40 cm3** |
-| Plastic | 15.92 cm3 | **11.29 cm3** |
+| Enclosed | 59.86 cm3 | **42.59 cm3** |
+| Plastic | 15.92 cm3 | **11.44 cm3** |
 | Parts | 3 | 2 |
 
 Same width, 16% shallower, 2.6 mm shorter, 29% less enclosed volume, 28% less
@@ -35,6 +35,26 @@ lip lands on that face and stands 0.80 proud, and the material around the
 opening is the full 1.7 bezel rather than a fragile ledge. 0.73 mm of case
 shows around the lip, against upstream's 0.835.
 
+**And that frame is a constant width, which it was not.** The section's corner
+radius was 7.00 -- carried over as the upstream look -- while the pocket's is
+3.20. Two roundings on the same face, not concentric, so the frame narrowed
+towards the diagonal: 1.70 at the sides, **0.83** at the corner, and 0.829
+measured off the mesh. The lip is wider than the pocket and lands on that same
+face, so at the corner it **overhung the case by 0.13 mm** with nothing under
+it. That is what the printed part shows and no render did -- a case corner
+visibly rounder than the display's, with the black lip standing proud of the
+plastic along it.
+
+Upstream can afford a 7.00 body corner because its display sits in a separate
+plate, `disp_mount`; here the outside of the case and the frame round the
+display are one face, and the radius is not free. It is `DISP_R + DISP_CLR +
+BEZEL` = **4.90** now, which puts both arcs on the same centres: 1.700 of frame
+everywhere, 0.735 of case showing round the lip everywhere, both echoed on
+every build. The envelope does not move; the four corners gain 0.115 cm3 of
+plastic. Keeping 7.00 *and* making it concentric was the other way out, and it
+costs a 3.80 bezel -- a 47.0 x 39.0 front face, 4.2 mm on the one dimension
+this design cannot give away.
+
 ## The clearances
 
 The size is set by the hat and the cable, not by walls or the display. Every
@@ -42,12 +62,18 @@ gate is computed and echoed on every build, because not one of them is visible
 in a render:
 
 ```
+ECHO: "frame round the pocket 1.7 mm at its thinnest  (want 1.7, its width on the flats)"
+ECHO: "case showing round the lip 0.735 mm at its thinnest  (want 0.735, ditto)"
 ECHO: "hat clears the ceiling by 2.69987 mm  (want 2.5)"
 ECHO: "plug room at the socket 7.04472 mm  (want 5.43)"
 ECHO: "headroom over the hat 20.3755 mm  (want 20)"
 ECHO: "tray kerbs from y 23.8195 to 41.4  (hat front 13.8)"
 ECHO: "driver at the top screws 6.07027 mm across  (want 5)"
 ```
+
+The first two are not clearances at all -- they are the front face, taken at
+the corner rather than on the flats, because that is where the section's
+rounding and the module's meet and where a mismatch between them shows first.
 
 The 20 is measured off the real bundle, from the hat's board. The plug-room ray
 carries only the plug's own reach; it used to carry the bundle's 15 mm as well,

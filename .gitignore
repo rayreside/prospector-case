@@ -1,6 +1,8 @@
 # ---------------------------------------------------------------- OpenSCAD
 # Rendered output - regenerate with:
 #   openscad -o out.stl -D 'part="top"' scad/urchin.scad
+# Deliberately path-scoped: release/ holds the printable exports and is
+# checked in, so this must not become a blanket *.stl rule.
 scad/**/*.stl
 scad/**/*.3mf
 scad/**/*.off
