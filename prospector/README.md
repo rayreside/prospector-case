@@ -32,28 +32,62 @@ finished flush, as upstream does, but that leaves a ring only 0.85 wide by
 0.80 deep standing around it -- two extrusion widths and four layers, and it
 does not print. Off, the face is one plane with the pocket's opening in it: the
 lip lands on that face and stands 0.80 proud, and the material around the
-opening is the full 1.7 bezel rather than a fragile ledge. 0.73 mm of case
-shows around the lip, against upstream's 0.835.
+opening is the full 1.7 bezel rather than a fragile ledge. 0.835 mm of case
+shows around the lip, the same as upstream.
 
-**And that frame is a constant width, which it was not.** The section's corner
-radius was 7.00 -- carried over as the upstream look -- while the pocket's is
-3.20. Two roundings on the same face, not concentric, so the frame narrowed
-towards the diagonal: 1.70 at the sides, **0.83** at the corner, and 0.829
-measured off the mesh. The lip is wider than the pocket and lands on that same
-face, so at the corner it **overhung the case by 0.13 mm** with nothing under
-it. That is what the printed part shows and no render did -- a case corner
-visibly rounder than the display's, with the black lip standing proud of the
-plastic along it.
+**And that frame is a constant width, which it was not, and getting there took
+two goes.** The story is worth keeping in full, because the first attempt was
+confidently wrong and every number in it was arithmetically correct.
 
-Upstream can afford a 7.00 body corner because its display sits in a separate
-plate, `disp_mount`; here the outside of the case and the frame round the
-display are one face, and the radius is not free. It is `DISP_R + DISP_CLR +
-BEZEL` = **4.90** now, which puts both arcs on the same centres: 1.700 of frame
-everywhere, 0.735 of case showing round the lip everywhere, both echoed on
-every build. The envelope does not move; the four corners gain 0.115 cm3 of
-plastic. Keeping 7.00 *and* making it concentric was the other way out, and it
-costs a 3.80 bezel -- a 47.0 x 39.0 front face, 4.2 mm on the one dimension
-this design cannot give away.
+The printed part showed a gap at each corner and nowhere else. The diagnosis
+was that the section's corner radius, 7.00 and carried over as "the upstream
+look", was not concentric with the pocket's 3.20: the frame narrowed toward the
+diagonal, 1.70 at the sides against **0.83** at the corner, 0.829 measured off
+the mesh, and the module's lip overhung the case by 0.13 mm there with nothing
+under it. So the radius was made derived -- `DISP_R + DISP_CLR + BEZEL` --
+which returned 4.90, and the corners filled in.
+
+**Every one of those figures is downstream of `DISP_R`, and `DISP_R` was
+wrong.** It said 3.00. Nothing had ever measured it; REFERENCE.md carries
+provenance for every other number about this module and never mentioned this
+one. Waveshare's panel table gives the corner as R5, and at R5 the whole
+account inverts:
+
+- **7.00 was already concentric.** It is what the identity above returns for a
+  module of about R5.1, and upstream's own front face measures 0.835 of plastic
+  round the lip -- uniform, corners included. Upstream had not been careless
+  with a styling number; it had the radius right.
+- **4.90 is now the mismatch.** Against the real module the frame runs 0.835 on
+  the flats and swells to **1.705** at the corners -- the same fault mirrored,
+  and visible in the model as corners that read too heavy.
+- **Neither radius was ever the gap.** The pocket is cut to `DISP_R +
+  DISP_CLR`, so at 3.00 it was 3.20 -- about two millimetres squarer than the
+  module at every corner. The module's round corner sat in a squarer hole and
+  left a crescent of open pocket. That is what the photograph shows. The
+  module's own rim normally hides the pocket, and that is why it was marginal
+  rather than obvious: at 3.00 the rim covers the corner by 0.865, at R5 by
+  **0.037**, and a hair past that the pocket is exposed.
+
+`DISP_R` is 5.00 now and `RIM_R` returns to 6.90 on its own. All four outlines
+-- module, pocket, lip, case -- come out as the same 29 x 21 rectangle grown by
+5.00, 5.20, 6.065 and 6.90, so every gap between them is constant: 0.200 of
+clearance round the module, 0.865 of rim over the pocket, 0.835 of case round
+the rim, corners and flats alike. The envelope does not move.
+
+`LIP_W` and `LIP_H` were wrong too, and in a way worth naming: they were
+41.33 x 33.33, read off **upstream's counterbore**, which is a hole and
+therefore cut oversize. Waveshare give the module as 41.13 x 33.13. Taken as
+the part it understated the frame round the lip at 0.735 against upstream's
+0.835 -- which read as this case being the tighter of the two, when they are
+identical. The check that settles it: with the part at 41.13 and `LIP_CLR` at
+0.10, this model's own counterbore comes out at 41.33 x 33.33, reproducing
+upstream's measured bore exactly.
+
+**The lesson is not about corners.** A derived number is only ever as good as
+what it derives from, and this one derived from the single figure in the file
+that nothing had measured. `DISP_R = 5.00` is still the vendor's number rather
+than a caliper on this part -- but it is now the *only* unmeasured input, and
+three independent things agree with it where nothing agreed with 3.00.
 
 ## The clearances
 
@@ -63,7 +97,7 @@ in a render:
 
 ```
 ECHO: "frame round the pocket 1.7 mm at its thinnest  (want 1.7, its width on the flats)"
-ECHO: "case showing round the lip 0.735 mm at its thinnest  (want 0.735, ditto)"
+ECHO: "case showing round the lip 0.835 mm at its thinnest  (want 0.835, ditto)"
 ECHO: "hat clears the ceiling by 2.69987 mm  (want 2.5)"
 ECHO: "plug room at the socket 7.04472 mm  (want 5.43)"
 ECHO: "headroom over the hat 20.3755 mm  (want 20)"
