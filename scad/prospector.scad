@@ -893,6 +893,22 @@ module cap_solid() {
 // outer() and by a plane parallel to the chamfer -- not by cap_solid(), whose
 // own boundary is a differently rounded trim and would leave slivers where the
 // two describe the same surface.
+//
+// IT HAS TO BE UNIONED ON, and for a long time it was not. Excluding it from
+// cap_void() only stops the cap's region taking it away; it does not put it
+// there. What was actually left behind the split was whatever outer() minus
+// hollow() happened to leave, and behind SPLIT_Y hollow() is deliberately
+// unbounded above -- so the roof there was governed by the cavity prism's own
+// top face, which crosses the chamfer. The lap came out as a WEDGE: 0.44 mm at
+// y = 30, 0.14 at 31, nothing by 31.5, against the 0.80 slab it is written as.
+//
+// That is the same feather edge that tore off the roof FORWARD of the split
+// and left a slot along the top of the cap. The forward side was fixed by
+// bounding the cavity with the cap's inner face; this side kept the fault,
+// because the fix was never applied to the material the lap is made of. On the
+// printed part it reads as a slot in the roof about 1.5 mm wide -- the lap
+// simply is not there, and what little of it printed was under one extrusion
+// width for its whole length.
 module seam_lip() {
     intersection() {
         difference() { outer(); trim(DEPTH + 1, -50, 0.5, SEAM_DROP); }
@@ -1007,7 +1023,8 @@ module shell() {
         union() {
             difference() { outer(); hollow(); }
             intersection() {
-                union() { bosses(); mcu_tray_placed(); cap_posts(); tie_posts(); }
+                union() { bosses(); mcu_tray_placed(); cap_posts(); tie_posts();
+                          seam_lip(); }
                 outer();
             }
         }

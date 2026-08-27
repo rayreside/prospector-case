@@ -5,15 +5,15 @@ are checked in so that a `git pull` puts the printable parts on disk -- the
 repository is the sync channel, and not everyone who wants to print this has
 OpenSCAD installed.
 
-Built with OpenSCAD 2021.01, from the commit that corrected the module's
-corner radius to the vendor's R5 -- which is what finally made the case's
-corners concentric with the display's, and returned RIM_R to 6.90.
+Built with OpenSCAD 2021.01, from the commit that unioned the seam lip into
+the shell -- before it, the lap over the rear cap was a feather edge and the
+roof had an open slot about 1.5 mm wide behind it.
 
 | | shell | cap |
 |---|---|---|
-| triangles | 3658 | 864 |
+| triangles | 3550 | 864 |
 | bounding box | 42.800 x 41.400 x 35.368 | 42.800 x 12.700 x 25.408 |
-| volume | 9.5591 cm3 | 1.8722 cm3 |
+| volume | 9.6219 cm3 | 1.8722 cm3 |
 | shells | 1 | 1 |
 | non-2-manifold edges | 0 | 0 |
 | boundary edges | 0 | 0 |
@@ -53,7 +53,7 @@ openscad -D 'part="cap"' -o release/prospector_cap.stl scad/prospector.scad
 
 `show_parts` is on by default and ghosts the display and the XIAO in place. On
 screen that is the point; in an STL it is the display and the XIAO exported
-inside the shell -- three shells and 27.13 cm3. The cap never draws them, so
+inside the shell -- three shells and 27.20 cm3. The cap never draws them, so
 its line needs nothing.
 
 Two things follow from checking these in:

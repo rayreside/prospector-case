@@ -251,6 +251,35 @@ says they do not overlap. It does not say they can be assembled. A face square
 to the direction of travel must not touch before the seating face does, and no
 static check in this repo can see the difference.
 
+**And a second lesson, from the same seam: that section above was computed, not
+measured, and for a long time it was not true.** The lap is described here as
+the outer 0.80 of the chamfer, and `seam_lip()` draws exactly that -- but it was
+never unioned into the shell. Leaving it out of `cap_void()` only stops the
+cap's region taking it away; it does not put it there. What was actually left
+behind the split was whatever `outer()` minus `hollow()` happened to leave, and
+behind `SPLIT_Y` the cavity is deliberately unbounded above, so the roof there
+was governed by the cavity prism's own top face -- which crosses the chamfer.
+
+The lap came out as a WEDGE, and every millimetre of it was under one extrusion
+width:
+
+    y = 30.0   0.44 mm       y = 31.2   0.08 mm
+    y = 30.5   0.30          y = 31.4   0.02
+    y = 31.0   0.14          y = 31.5   nothing
+
+So from y = 31.5 to where the cap's own skin starts at 32.3, **no part owned the
+roof at all** -- an open slot about 1.5 mm wide, plus whatever of the feather
+edge tore off in the printing. It is the same failure as the roof forward of the
+split, which was fixed by bounding the cavity with the cap's inner face; this
+side kept the fault, because the fix was never applied to the material the lap
+is made of.
+
+`seam_lip()` is unioned on now. The lap is 0.80 thick over its whole 2 mm, the
+figures above are measured off the mesh rather than derived, and the 30.7 x 0.40
+sliver that `thin.py` had been reporting at z = 26 -- and that had been written
+off as inherent to the joint -- is gone with it. What is left on the roof is the
+0.30 line at y = 32, which is the travel clearance and is meant to be there.
+
 ### The rear screws
 
 The pilot has been wrong in both directions, which is worth recording because
