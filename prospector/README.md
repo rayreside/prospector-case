@@ -6,6 +6,12 @@ carrying a socket for the LCD cable — so the link is a plugged cable at both
 ends rather than eight wires soldered to the XIAO's pads. That hat is what the
 design is really shaped around.
 
+Specifically, it is cut around
+[beekeeb's Prospector kit](https://shop.beekeeb.com/products/zmk-wireless-dongle-prospector-diy-kit),
+whose adapter PCB is that hat. An original Prospector solders the display
+straight to the XIAO's pads and makes a differently shaped stack; this case may
+or may not take one, and would need modifying to.
+
 Model: [`scad/prospector.scad`](../scad/prospector.scad), hardware constants in
 [`prospector_hw.scad`](../scad/prospector_hw.scad), measurements and their
 provenance in [REFERENCE.md](REFERENCE.md). Built to `build/prospector/`.

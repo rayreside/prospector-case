@@ -26,16 +26,20 @@ exported inside it -- see below.
 
 ## Printing
 
-**Shell desk-down as modelled.** 555 mm2 of support and **1446 mm2** of bed
+**Shell desk-down as modelled.** 678 mm2 of support and **1414 mm2** of bed
 contact, against 117 mm2 back-down -- and all of that support is interior roof
 nobody sees. Measured with `tools/overhang.py`, not reasoned about; it
 contradicts the obvious guess about the sloping roof.
 
-**Cap standing on its bottom edge, with a brim.** Its 638 mm2 is one surface,
-the chamfer, sitting at 44.81 degrees -- two tenths under the 45 the tool
-defaults to. At `--thresh 44` the same orientation scores 20 mm2, so it needs
-almost no support standing up; what it does need is the brim, because 69 mm2 of
-bed contact under a part 26.8 mm tall is not enough on its own.
+**Cap standing on its bottom edge, with a brim.** Its 622 mm2 is very nearly one
+surface, the chamfer, sitting at 44.81 degrees -- two tenths under the 45 the
+tool defaults to. At `--thresh 44` the same orientation scores **20 mm2**, so it
+needs almost no support standing up; what it does need is the brim, because
+69 mm2 of bed contact under a part 25.4 mm tall is not enough on its own.
+
+The shell reads the same way: 678 mm2 at 45 degrees, **435** at 44. Set the
+slicer's threshold below the chamfer's own angle and most of both figures goes
+away, because most of what they count is that one surface.
 
 **0.20 layer height**, whatever the printer: the joint steps are 0.80 and the
 cap is 1.60, and both divide exactly. Support for the shell only -- anything
@@ -64,6 +68,6 @@ geometry has to rebuild both and commit them in the same commit, or the files
 here describe a case that no longer exists.
 
 **Do not diff them by hash.** OpenSCAD does not emit facets in a stable order,
-so two builds of the same tree give two different files -- 134981 bytes apart
-on the shell, with the same 3226 triangles and the same vertex set. `stlstat.py`
-is the comparison that means anything; `md5sum` is not.
+so two builds of the same tree give two different files with the same triangle
+count and the same vertex set. `stlstat.py` is the comparison that means
+anything; `md5sum` is not.
