@@ -277,8 +277,30 @@ is made of.
 `seam_lip()` is unioned on now. The lap is 0.80 thick over its whole 2 mm, the
 figures above are measured off the mesh rather than derived, and the 30.7 x 0.40
 sliver that `thin.py` had been reporting at z = 26 -- and that had been written
-off as inherent to the joint -- is gone with it. What is left on the roof is the
-0.30 line at y = 32, which is the travel clearance and is meant to be there.
+off as inherent to the joint -- is gone with it.
+
+**The line that is left is meant to be there, and it is now two numbers rather
+than one.** `SEAM_CLR` was doing both ends of the lap at 0.30, and they are not
+the same problem:
+
+- The **tongue's tip**, against the shell's roof end at `SPLIT_Y`. It sits under
+  the lap where nothing can see it, and it is the clearance that bent the roof
+  backwards when it was zero. `SEAM_CLR`, still 0.30.
+- The **cap's shoulder**, where its skin steps back up to full thickness against
+  the trailing end of the lap. Neither part owns the roof across it, so this is
+  the visible line -- and on a 45 degree roof it opens up by 1/cos, showing 1.41
+  times its own width. At 0.30 that was 0.42 mm of open groove 0.80 deep, which
+  is a mark, not a hairline. `SEAM_SHOW`, now **0.15**, showing 0.21 and echoed
+  on every build.
+
+Tightening only that end is safe in a way tightening both would not be. If the
+shoulder binds, the cap stops 0.15 short of a seat two screws are pulling it
+onto, over a step 0.80 deep, and it shows as a gap at the back plate. If the
+**tip** binds it levers the whole roof, which is the failure this joint exists
+to avoid. What the shoulder has to absorb is the difference between two
+nominally 9.4 mm runs from each part's seating face -- and both are plain y
+positions, vertical walls placed by XY motion on both parts rather than
+layer-quantised, so it is XY accuracy twice over and nothing worse.
 
 ### The rear screws
 

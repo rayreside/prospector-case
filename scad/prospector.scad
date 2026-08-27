@@ -855,6 +855,11 @@ DRIVER_FIT = 2 * ((SPLIT_Y - SCR_Y) * cos(TILT)
                 + (ch_at(SPLIT_Y, CAP_DROP) - SCR_Z) * sin(TILT));
 echo(str("driver at the top screws ", DRIVER_FIT, " mm across  (want ",
          ACCESS_D, ")"));
+// What the seam actually shows on the roof, which is the number to watch when
+// SEAM_SHOW is touched -- the gap is cut in y and read on a 45 degree face, so
+// it is always the wider of the two.
+echo(str("seam shows ", SEAM_SHOW / cos(atan(-CH_M)),
+         " mm across the roof  (cut at ", SEAM_SHOW, " in y)"));
 
 // THE SEAM IS A LAP NOW, NOT A BUTT, AND THIS IS WHY.
 //
@@ -878,6 +883,31 @@ echo(str("driver at the top screws ", DRIVER_FIT, " mm across  (want ",
 // underside and the tip's top face still meet, so the shell also holds the
 // cap's roof down instead of merely abutting it.
 SEAM_CLR  = 0.30;     // the cap's roof tip stops this far short of SPLIT_Y
+// The OTHER end of the lap, and it was the same number until it became clear
+// the two are not the same problem.
+//
+// SEAM_CLR above is the tongue's tip against the shell's roof end. It sits
+// under the lap where nothing can see it, and it is the clearance that bent the
+// roof backwards when it was zero -- so it stays generous.
+//
+// This one is the cap's shoulder, where its skin steps back up to full
+// thickness, against the trailing end of the shell's lap. Neither part owns the
+// roof across it, so it is the 0.3 line the note above admits to -- and on a
+// 45 degree roof it opens up by 1/cos, showing 1.41 times its own width: 0.42
+// at 0.30. That is a groove 0.80 deep, not a hairline, and it is the mark on
+// the printed part after the lap itself was fixed.
+//
+// The two ends do not carry the same risk either. If this one binds, the cap
+// stops 0.15 short of a seat it is being pulled onto by two screws, on a step
+// only 0.80 deep, and the fault shows as a gap at the back plate. If the TIP
+// binds it levers the whole roof. So this end can be tightened and that one
+// should not be.
+//
+// What it has to absorb: the difference between two nominally 9.4 mm runs, from
+// each part's own seating face to its end of the lap. Both are plain y
+// positions in the print -- vertical walls placed by XY motion on both parts,
+// not layer-quantised -- so it is XY accuracy twice over and nothing worse.
+SEAM_SHOW = 0.15;     // and how far the cap's shoulder stands off the lap's end
 SEAM_LAP  = 2.00;     // how far the shell's skin reaches back over it
 SEAM_T    = 0.80;     // half of CAP_T, so neither member is thinner than that
 SEAM_DROP = SEAM_T * sqrt(1 + CH_M * CH_M);
@@ -929,7 +959,7 @@ module cap() {
         intersection() {
             difference() { outer(); trim(DEPTH + 1, -50, 0.5, SEAM_DROP); }
             translate([-100, -100, -100])
-                cube([200, 100 + SPLIT_Y + SEAM_LAP + SEAM_CLR, 200]);
+                cube([200, 100 + SPLIT_Y + SEAM_LAP + SEAM_SHOW, 200]);
         }
         usb_slot();
         cap_screws();
