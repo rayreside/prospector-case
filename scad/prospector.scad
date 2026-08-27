@@ -44,6 +44,7 @@ show_parts = true;    // ghost the display and the XIAO in place
 $fa = 2; $fs = 0.4;
 
 include <prospector_hw.scad>
+include <prospector_plug.scad>
 
 /* [Geometry] */
 BACK_CHAMFER = true;  // break the top-back corner, per the sketch
@@ -327,6 +328,50 @@ MCU_LIFT  = 0.40;     // standoff under the hat
 MCU_DX    = MCU_D;    // across the case
 MCU_DY    = MCU_W;    // front to back -- the axis the USB-C exits along
 MCU_DZ    = MCU_H;
+
+/* [Dress-up sockets] */
+// OFF, and the default build is the case as it was -- byte for byte, which is
+// checked rather than assumed. On, the shell grows a pad on the crown with one
+// socket in it and a socket in each side wall, so printed hats and arms can be
+// plugged in. Nothing else about the case changes: no dimension moves, no
+// clearance is spent, and all five echoes above come back identical.
+//
+// The peg itself lives in prospector_plug.scad, shared with the accessories.
+//
+// EVERYTHING HERE GROWS OUTWARD, and that is not a style choice. The tightest
+// gate in the case is the cable's headroom, 20.38 against a want of 20, and it
+// is decided at y = 27.3 -- the middle of the only stretch of roof the shell
+// owns. A boss hanging inward from the crown would eat straight into it.
+//
+// Worse, it would eat into it invisibly over most of the roof. WIRE_FIT is a
+// MAX over the sampled abscissae: it reports the best ceiling anywhere over
+// the hat, so an intrusion at any y other than the winning one does not move
+// the number at all. The check would have gone on printing 20.38 while the
+// bundle lost room. That is the same shape of fault as the infinite plane and
+// the ray to a face the hat does not reach, and the answer here is not a
+// better check but geometry that cannot commit the error: the pad stands on
+// the outside of the skin and the bore is blind.
+DRESS = false;
+
+// Where the pad sits on the roof. The shell owns the chamfer from y = 25.0,
+// where it first cuts the prism, to SPLIT_Y at 30 -- five millimetres, and
+// that is the whole budget. Forward of 25 the chamfer plane is above the
+// prism's rounded apex and there is no skin under it to stand on; behind 30
+// the roof belongs to the rear cap. 27.5 centres the pad in what is left.
+CROWN_Y    = 27.50;
+CROWN_SINK = 0.60;    // how far the pad is buried in the skin, so nothing is
+                      // coplanar -- the roof is 1.60, which leaves 1.00
+
+// The arms. Blind bores in the side wall, which is only 1.60 thick, so each
+// gets a boss behind it -- 1.20 of socket would strip the first time an arm
+// was leaned on. The wall's inner face is at 19.80 and the tray kerb's outer
+// face at 12.75, so five millimetres of boss is what the gap will take with
+// something left over. Every one of those clearances is echoed below.
+ARM_Y      = 26.00;
+ARM_Z      = 12.00;
+ARM_BOSS_D = 8.00;
+ARM_BOSS_L = 5.00;    // inward from the wall's inner face
+ARM_BITE   = 0.80;    // and how far into the wall it starts, so it fuses
 
 /* ---------- derived ---------- */
 POCK_W = DISP_W + 2 * DISP_CLR;
@@ -623,6 +668,108 @@ module trim(back, floor, r, drop = 0) {
                 : [[FRONT, floor], [back, floor], [back, 60], [FRONT, 60]]);
 }
 
+/* ---------- the dress-up sockets ---------- */
+// Everything below reads CH_M, ch_at, vof and wof, so it has to live after
+// them. A forward reference here comes back undef and the feature simply does
+// not appear, with nothing to say why -- which this file has done before.
+
+CH_ANG  = atan(-CH_M);                     // the roof, from horizontal
+CROWN_Z = ch_at(CROWN_Y, 0);               // the skin, on the centreline
+ARM_X0  = SEC_W / 2 - WALL;                // the side wall's inner face
+
+// How wide the prism is at height v up its cross-section. This is what says
+// whether there is any skin under the crown pad: forward of where the chamfer
+// first cuts the prism it comes back zero, and a pad drawn there would float
+// above the case joined to nothing.
+function sec_half(v) =
+    let (a = abs(v), h2 = (SEC_H + DROP) / 2, flat = h2 - RIM_R)
+    a <= flat ? SEC_W / 2
+  : a >= h2  ? 0
+  : SEC_W / 2 - RIM_R + sqrt(max(0, RIM_R * RIM_R - (a - flat) * (a - flat)));
+
+// The pad's two edges, in world y. Moving a millimetre along the roof moves
+// cos(CH_ANG) of a millimetre in y, which is 0.71 -- the roof is at 45 degrees
+// and the fore-aft budget is smaller than it looks on the section.
+CROWN_FY = CROWN_Y - PAD_L / 2 * cos(CH_ANG);
+CROWN_BY = CROWN_Y + PAD_L / 2 * cos(CH_ANG);
+CROWN_FW = 2 * sec_half(vof(CROWN_FY, ch_at(CROWN_FY, 0)) + DROP / 2);
+
+// The clearances the sockets have to make, every one of them a number rather
+// than a look at the render. The access bore is the one worth having: it
+// leaves the display's lower boss at 55 degrees and passes down the side of
+// the case exactly where an arm wants to be, and it has already notched a
+// kerb once on a printed part.
+// The boss's apex points down, and the access bore is down and forward of it,
+// so the reach that matters is the apex's and not the radius. Taken as the
+// full tear_h rather than its component along the bore's own perpendicular,
+// which overstates it by about a millimetre -- deliberately, and for the same
+// reason KERB_Y is conservative: it should not quietly go wrong if the boss
+// or the display moves.
+ARM_ACC  = abs(vof(ARM_Y, ARM_Z) + HOLE_DY / 2)
+         - (tear_h(ARM_BOSS_D) + ACCESS_D / 2);
+ARM_DISP = -wof(ARM_Y, ARM_Z) - ARM_BOSS_D / 2;
+ARM_KERB = (ARM_X0 - ARM_BOSS_L) - (MCU_DX / 2 + MCU_CLR + KERB);
+
+// The gates that depend on the seam are further down, with it -- SPLIT_Y and
+// SEAM_CLR are declared below this point, and read from here they come back
+// undef and echo a hole instead of a number.
+
+// The pad's own frame: origin on the skin at CROWN_Y, local z out along the
+// roof's normal, local y down the slope. Sunk CROWN_SINK into the skin rather
+// than landing on it -- a face that lands exactly on a surface is how this
+// case has produced a detached shell, a non-manifold edge and 219
+// self-intersections, and the roof is 1.60 thick so 0.60 is free.
+module crown_at(w) {
+    translate([0, CROWN_Y, CROWN_Z]) rotate([-CH_ANG, 0, 0])
+        translate([0, 0, w]) children();
+}
+
+module crown_pad() {
+    crown_at(-CROWN_SINK) linear_extrude(PAD_H + CROWN_SINK) pad2d();
+}
+
+// The apex points ACROSS the case, not up the slope, and that is forced. Up
+// the slope the profile is 2.26 mm long and the pad has 2.75 to give either
+// side of centre -- the wall ahead of the apex would come out 0.5 mm, under
+// two extrusion widths, on the one part of the roof that has already torn once
+// as a feather edge. Across the case there is 17 mm of half-width to spend.
+// The bore is at 45 degrees to the bed either way, so nothing is given up on
+// the print; what moves is only which way a hat is keyed, and the pad's own
+// rectangle keys that far more strongly than the apex ever could.
+module crown_socket() {
+    crown_at(PAD_H - CROWN_DEPTH) rotate([0, 0, -90])
+        linear_extrude(CROWN_DEPTH + 2) teardrop2d(SOCK_D);
+}
+
+// Bosses behind the side wall. Started ARM_BITE inside the wall so it fuses
+// rather than meeting it on a plane, and stopped well short of the tray.
+//
+// A TEARDROP POINTING DOWN, which is the same trick as the bore's and used
+// for the opposite face. A round boss hanging off a vertical wall presents its
+// whole underside to the bed -- 65 mm2 of it across the pair, measured, all of
+// it needing support inside a case where support is already the thing being
+// minimised. Bringing the underside to a 45 degree point carries it instead.
+// The bore's apex points up and the boss's points down; between them the two
+// halves of the feature that would have wanted support both stand on their
+// own.
+module arm_bosses() {
+    for (sx = [-1, 1])
+        translate([sx * (ARM_X0 + ARM_BITE), ARM_Y, ARM_Z])
+            rotate([0, -sx * 90, 0]) rotate([0, 0, sx * 90])
+                linear_extrude(ARM_BOSS_L + ARM_BITE)
+                    teardrop2d(ARM_BOSS_D, PEG_TIP);
+}
+
+// Blind, and measured from the outside face. The apex points up in the world,
+// which is up on the bed too -- the shell prints desk-down, so this is the
+// bore that would otherwise have to span its own ceiling.
+module arm_sockets() {
+    for (sx = [-1, 1])
+        translate([sx * (SEC_W / 2 + 1), ARM_Y, ARM_Z])
+            rotate([0, -sx * 90, 0]) rotate([0, 0, -sx * 90])
+                linear_extrude(ARM_DEPTH + 1) teardrop2d(SOCK_D);
+}
+
 /* ---------- the case ---------- */
 
 module outer() {
@@ -882,6 +1029,45 @@ SEAM_LAP  = 2.00;     // how far the shell's skin reaches back over it
 SEAM_T    = 0.80;     // half of CAP_T, so neither member is thinner than that
 SEAM_DROP = SEAM_T * sqrt(1 + CH_M * CH_M);
 
+// The dress-up gates that depend on the seam, which is why they are here and
+// not up with the rest of them. Written above SPLIT_Y they read undef, and an
+// undef in a str() prints "undef" rather than failing -- so the check reports
+// a hole and the build carries on. That is not hypothetical; it happened on
+// the first run of this block.
+//
+// The pad's footprint stops at 29.45, forward of the split. But the pad is
+// 3.6 mm thick perpendicular to a roof at 45 degrees, so its top-rear corner
+// reaches y = 31.6 -- out over ground the REAR CAP owns, with air underneath.
+//
+// So it has to be a number, for the reason the seam is a lap: a part that
+// travels has to be able to reach its seat, and no mesh check in this repo can
+// see the difference between touching and colliding. The cap comes forward
+// along -y with its roof riding the chamfer, so what matters is how far the
+// pad's rear face stands above the chamfer at the cap's leading edge. Positive
+// and the cap passes under it; zero and the cap stops there instead of on its
+// seat, however hard the screws are turned.
+CAP_LEAD  = SPLIT_Y + SEAM_CLR;                   // where the cap's skin starts
+CROWN_GAP = ch_at(CROWN_BY, 0)
+          + (CAP_LEAD - CROWN_BY) / sin(CH_ANG) * cos(CH_ANG)
+          - ch_at(CAP_LEAD, 0);
+
+if (DRESS) {
+    echo(str("crown pad at y ", CROWN_FY, "..", CROWN_BY,
+             "  (roof band starts 25.0, split at ", SPLIT_Y, ")"));
+    echo(str("roof under the pad's front edge ", CROWN_FW,
+             " mm wide  (pad wants ", PAD_W, ")"));
+    echo(str("crown socket leaves ", PAD_H + WALL - CROWN_DEPTH,
+             " mm of roof under it  (want 1)"));
+    echo(str("crown pad clears the cap's roof by ", CROWN_GAP,
+             " mm as it comes forward  (want > 0)"));
+    echo(str("arm socket leaves ", WALL + ARM_BOSS_L - ARM_DEPTH,
+             " mm behind it  (want 1)"));
+    echo(str("arm boss clears the access bore by ", ARM_ACC,
+             " mm, the display by ", ARM_DISP, ", the kerb by ", ARM_KERB));
+    echo(str("roof is ", CH_ANG, " deg; the plug file assumes ", PAD_TILT,
+             "  (out by ", CH_ANG - PAD_TILT, ")"));
+}
+
 module cap_solid() {
     intersection() {
         difference() { outer(); trim(DEPTH - CAP_T, 0, BACK_R, CAP_DROP); }
@@ -1007,7 +1193,8 @@ module shell() {
         union() {
             difference() { outer(); hollow(); }
             intersection() {
-                union() { bosses(); mcu_tray_placed(); cap_posts(); tie_posts(); }
+                union() { bosses(); mcu_tray_placed(); cap_posts(); tie_posts();
+                          if (DRESS) arm_bosses(); }
                 outer();
             }
         }
@@ -1019,8 +1206,14 @@ module shell() {
         cap_screws();
         cap_void();
     }
+    // Outside the intersection with outer(), unlike every other addition here
+    // -- this is the one feature that deliberately stands proud of the skin,
+    // and clipping it to outer() would leave nothing but the 0.60 buried in
+    // the roof.
+    if (DRESS) crown_pad();
     }
     hat_screws();
+    if (DRESS) { crown_socket(); arm_sockets(); }
     }
 }
 

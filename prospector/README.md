@@ -362,6 +362,171 @@ thin-wall detection on; and support for the shell only. The cap standing up
 needs almost none, and support anywhere near the display seat has to come back
 out through the pocket.
 
+## The dress-up variant
+
+An alternative version, not a replacement: `DRESS = true` adds a pad with a
+socket on the crown for plug-in hats, and a socket in each side wall for
+plug-in arms. Off, the build is unchanged — same volume to four decimals, same
+bounding box, same triangle count, and `tools/clusters.py` finds nothing at any
+section. On, the case is 6.8% more plastic and *nothing else moves*: the
+envelope, the two parts, the rear cap and all five clearance echoes come back
+identical.
+
+Accessories are in [`prospector_dress.scad`](../scad/prospector_dress.scad);
+the peg and the pad they mate to are in
+[`prospector_plug.scad`](../scad/prospector_plug.scad), shared with the case
+for the same reason `prospector_hw.scad` is shared — a socket and a peg are two
+halves of one dimension.
+
+### Everything grows outward, and that is forced
+
+The tightest gate in the case is the cable's headroom: **20.38 against a want
+of 20**, and it is decided at **y = 27.3** — which is the middle of the only
+stretch of roof the shell owns. A boss hanging inward from the crown would eat
+straight into the one clearance with no margin left.
+
+The worse half is that it would do it *silently*. `WIRE_FIT` is a `max` over
+the sampled abscissae — it reports the best ceiling anywhere over the hat — so
+an intrusion at any y other than the winning one does not move the number at
+all. The check would have gone on printing 20.38 while the bundle lost room.
+
+That is the same shape as the three faults already recorded here: the infinite
+plane where the display is a bounded slab, the ray to a face the hat does not
+reach, the measurement taken from the socket instead of the board. The answer
+this time was not a better check but geometry that cannot commit the error —
+the pad stands on the outside of the skin and every bore is blind.
+
+### The roof band is five millimetres
+
+The shell owns the chamfer from **y = 25.0**, where it first cuts the prism, to
+`SPLIT_Y` at 30. Forward of 25 the chamfer plane is above the prism's rounded
+apex and there is no skin under it to stand a pad on; behind 30 the roof
+belongs to the rear cap. Five millimetres of y, and because the roof is at 45
+degrees that is only 7 mm along the surface.
+
+Where it *starts* is set by the prism's apex and how *wide* it is by the corner
+radius, which is why making the corners concentric with the display's — `RIM_R`
+from 7.00 to 4.90 — moved the second and left the first alone. The pad still
+begins at 25.0, and the roof under its front edge went from 31.81 wide to
+35.51. Nothing had to be re-derived to find that out: `sec_half()` reads
+`RIM_R`, so the gate reported it on the next build.
+
+It is what sized the pad, at 14 x 5.5, and it is why the socket's teardrop
+**points across the case rather than up the slope**. Up the slope the profile
+is 2.26 long and there would have been 0.5 mm of wall ahead of its apex — under
+two extrusion widths, on the one part of the roof that has already torn off as
+a feather edge once. Across, there is 17 mm of half-width to spend. Nothing is
+lost on the print either way, because the bore is at 45 degrees to the bed in
+both cases. What the apex would have keyed, the pad's own rectangle keys far
+harder: a hat that pockets over a 14 x 5.5 rounded rectangle cannot rotate.
+
+### The teardrop earns its keep on the arms
+
+There it does two jobs at once. The arm sockets are horizontal blind bores in a
+wall that prints desk-down, so a round hole has to bridge its own ceiling; the
+apex carries it at 45 degrees. And a round peg in a round hole spins, so an arm
+sags to wherever gravity puts it.
+
+The **boss** behind each socket is a teardrop too, pointing the other way. A
+round boss hanging off a vertical wall presents its whole underside to the bed
+— 65 mm2 across the pair, measured — and support inside this case is exactly
+what the whole print orientation exists to minimise. Pointed downward it stands
+on its own: 58 of those 65 mm2 came straight back.
+
+The wall is 1.6, so a flush blind hole would be 1.2 deep and would strip the
+first time an arm was leaned on. The boss makes it 6.6, blind, with 2.1 left
+behind the bore.
+
+### The new gates
+
+Six of them, echoed on every dressed build, because not one is visible in a
+render:
+
+```
+ECHO: "crown pad at y 25.549..29.451  (roof band starts 25.0, split at 30)"
+ECHO: "roof under the pad's front edge 35.5118 mm wide  (pad wants 14)"
+ECHO: "crown socket leaves 1.4 mm of roof under it  (want 1)"
+ECHO: "crown pad clears the cap's roof by 1.698 mm as it comes forward  (want > 0)"
+ECHO: "arm socket leaves 2.1 mm behind it  (want 1)"
+ECHO: "arm boss clears the access bore by 4.85043 mm, the display by 5.19057, the kerb by 2.05"
+```
+
+Two are worth naming. **The access bore** leaves the display's lower boss at 55
+degrees and passes down the side of the case exactly where an arm wants to be —
+it has already notched a kerb once on a printed part, which is why `KERB_Y`
+exists. **The cap's roof** is the other: the pad's footprint stops at 29.45,
+forward of the split, but the pad is 3.6 thick perpendicular to a 45 degree
+roof, so its top-rear corner reaches y = 31.6 — out over ground the rear cap
+owns, with air underneath. A part that travels has to be able to reach its
+seat, and no mesh check in this repo can tell touching from colliding. That one
+is the seam's lesson applied before rather than after the print.
+
+A seventh checks the two files against each other: the case derives the roof's
+angle from `CH_M` and the plug file states it, and the difference is echoed.
+
+### What the intersection check caught
+
+The accessories were tested by building `intersection(shell, fitted accessory)`
+and measuring it — the same check the seam note warns is *not sufficient*, but
+here it is the right question, because an accessory goes on last along its own
+peg axis with nothing else moving. It found three real collisions that every
+per-part check passed:
+
+- **The cap sat 3.5 mm inside the roof.** Its crown was drawn as a whole
+  ellipsoid, which reached 6.5 below the pad's face when the roof is 3.0 below
+  it. 0.48 cm3 of overlap. The cap was one watertight shell and the case was
+  one watertight shell, and each was perfectly correct alone.
+- **The crown's hull passed under its own collar.** A hull from the collar's
+  plate out to the dome's front rim is a straight line between two points, and
+  that line dips below the pad the collar is sitting on. It fouled the case
+  over 11 mm of the pad's front edge, at 0.031 cm3 — small enough to look like
+  rounding, and it is not. `CROWN_BASE` is set by that line, not by looks.
+- **The arm's shoulder sphere reached 0.65 inside the wall**, where the socket
+  bore does not go. 0.2 mm3 of interference — precisely the size that gets
+  waved away as rounding, and the reason to check what a number is made of
+  before dismissing it. It was a sphere of a known radius sitting 0.65 too far
+  in, and it says so: the overlap's width at the wall is 3.659, which is that
+  sphere's diameter at that depth exactly.
+
+All three now come back with no geometry at all. None of them would have been
+found by looking at the parts.
+
+### Printing it
+
+The shell is unchanged: desk-down, as before. Measured against the plain shell
+at the same settings, the sockets cost **6.7 mm2** of extra overhang — 681.6
+against 674.9 — and no bed contact and no height.
+
+The accessories were swept the same way:
+
+| | best rotation | support | bed contact |
+|---|---|---|---|
+| cap | 45 deg, i.e. as worn | 72.9 mm2 | **0.0 mm2** |
+| arm | 180 deg | 74.7 mm2 | 0.6 mm2 |
+| coupon | as modelled | 0.2 mm2 | 616 mm2 |
+
+**Read the cap's row honestly: it has no flat face in any orientation**, which
+is what a dome and a rounded brim come to. Every rotation reports zero bed
+contact, so it wants a raft whatever you do, and 45 degrees is only the least
+bad on overhang. The arm is the same story more mildly. Neither is a structural
+part and both are meant to be forked, but do not read those support figures as
+a claim that they print unattended.
+
+The coupon does print cleanly, and it is the one to print first: `PEG_FIT` is
+the single number in `prospector_plug.scad` that belongs to the printer rather
+than to the design.
+
+### Still unproven here
+
+- **Nothing in this variant has been printed.** The clearances are computed and
+  the fits are checked against the model, which is exactly the state the butt
+  seam was in before it cost a print.
+- **`PEG_FIT` is a guess** at 0.20, which is what the coupon exists to settle.
+- **The cap has no flat face to print on**, above.
+- **Nothing checks an accessory against the assembled case**, only against the
+  shell. The rear cap is behind the crown pad and clear of it by 1.70, but an
+  accessory large enough to reach back over the cap would not be caught.
+
 ## Still to do
 
 - ~~Shell and cap meet at exactly 0.00~~ — **this was the wrong conclusion, and
